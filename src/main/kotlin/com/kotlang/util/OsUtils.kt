@@ -1,5 +1,6 @@
 package com.kotlang.util
 
+import com.kotlang.ui.shell.HistoryItem
 import java.io.IOException
 import java.nio.file.FileSystems
 import java.nio.file.Path
@@ -15,11 +16,12 @@ fun Path.changePath(destination: Path): Path =
             .normalize().toAbsolutePath()
 
 
-fun String.runCommand(workingDir: Path, changePath: (Path) -> Unit): String? {
+fun String.runCommand(workingDir: Path, changePath: (Path) -> Unit): HistoryItem {
+    var output = HistoryItem(this)
+
     try {
         val parts = this.split("\\s".toRegex())
         var newPath = workingDir
-        var output = ""
 
         if (parts[0] == "cd") {
             newPath = workingDir.changePath(Paths.get(parts[1]))
@@ -31,13 +33,14 @@ fun String.runCommand(workingDir: Path, changePath: (Path) -> Unit): String? {
                 .start()
 
             proc.waitFor(60, TimeUnit.MINUTES)
-            output = proc.inputStream.bufferedReader().readText()
+            output.output = proc.inputStream.bufferedReader().readText()
+            output.error = proc.errorStream.bufferedReader().readText()
         }
 
         changePath(newPath)
-        return output
     } catch(e: IOException) {
         e.printStackTrace()
-        return null
     }
+
+    return output
 }

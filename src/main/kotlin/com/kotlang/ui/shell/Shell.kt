@@ -1,7 +1,6 @@
 package com.kotlang.ui.shell
 
 import androidx.compose.foundation.ScrollableColumn
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -17,7 +16,8 @@ import java.nio.file.Path
 
 data class HistoryItem(
     val command: String,
-    val output: String?
+    var output: String? = null,
+    var error: String? = null
 )
 
 @Composable
@@ -37,6 +37,7 @@ fun HistoryEntry(historyItem: HistoryItem) {
             }
 
             Text(historyItem.output ?: "")
+            Text(historyItem.error ?: "", color = Color.Red)
         }
     }
 }

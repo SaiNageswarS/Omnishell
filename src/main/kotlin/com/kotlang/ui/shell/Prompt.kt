@@ -33,8 +33,7 @@ fun Prompt(workingDir: Path, appendHistory: (HistoryItem) -> Unit,
             activeColor = Color.LightGray,
             onValueChange = {
                 if (it.endsWith("\n") && !command.value.endsWith("\\")) {
-                    val historyItem = HistoryItem(command.value,
-                        command.value.runCommand(workingDir, changePath))
+                    val historyItem = command.value.runCommand(workingDir, changePath)
                     appendHistory(historyItem)
                     command.value = ""
                 } else {
