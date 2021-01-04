@@ -13,13 +13,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import com.kotlang.HistoryItem
 import com.kotlang.util.runCommand
 import java.nio.file.Path
 
 
 @Composable
-fun Prompt(workingDir: Path, appendHistory: (HistoryItem) -> Unit,
-           changePath: (Path) -> Unit) {
+fun Prompt(workingDir: Path, refreshShellTab: (Path, HistoryItem) -> Unit) {
     val command = remember { mutableStateOf("") }
 
     Card(
@@ -33,8 +33,7 @@ fun Prompt(workingDir: Path, appendHistory: (HistoryItem) -> Unit,
             activeColor = Color.LightGray,
             onValueChange = {
                 if (it.endsWith("\n") && !command.value.endsWith("\\")) {
-                    val historyItem = command.value.runCommand(workingDir, changePath)
-                    appendHistory(historyItem)
+                    runCommand(workingDir, command.value, refreshShellTab)
                     command.value = ""
                 } else {
                     command.value = it
