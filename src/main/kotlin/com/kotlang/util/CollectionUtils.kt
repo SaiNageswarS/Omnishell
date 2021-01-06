@@ -13,3 +13,7 @@ fun<T> MutableList<T>.cloneAndReplace(item: T, index: Int): MutableList<T> {
     newList[index] = item
     return newList
 }
+
+fun String.sanitize(): String {
+    return this.trim()
+}

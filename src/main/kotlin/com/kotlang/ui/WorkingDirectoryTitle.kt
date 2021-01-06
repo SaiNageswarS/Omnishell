@@ -1,19 +1,25 @@
 package com.kotlang.ui
 
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Divider
 import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import java.net.InetAddress
 import java.nio.file.Path
 
 @Composable
 fun WorkingDirectoryTitle(currentPath: Path) {
-    Row(modifier = Modifier.padding(20.dp)) {
-        Text("PWD: ", color = Color.Green)
-        Text(currentPath.toString())
+    val hostName = InetAddress.getLocalHost().hostName
+    val userName = System.getProperty("user.name")
+
+    TopAppBar {
+        Text(
+            "$userName@$hostName:$currentPath",
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth().padding(10.dp))
     }
 }

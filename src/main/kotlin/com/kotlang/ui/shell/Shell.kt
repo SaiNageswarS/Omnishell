@@ -1,6 +1,7 @@
 package com.kotlang.ui.shell
 
 import androidx.compose.foundation.ScrollableColumn
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -10,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.kotlang.HistoryItem
+import com.kotlang.util.sanitize
 import java.nio.file.Path
 
 @Composable
@@ -28,8 +30,8 @@ fun HistoryEntry(historyItem: HistoryItem) {
                 Text(historyItem.command, color = Color.Green)
             }
 
-            Text(historyItem.output ?: "")
-            Text(historyItem.error ?: "", color = Color.Red)
+            Text(historyItem.output?.sanitize() ?: "")
+            Text(historyItem.error?.sanitize() ?: "", color = Color.Red)
         }
     }
 }
@@ -40,7 +42,7 @@ fun Shell(workingDir: Path, history: List<HistoryItem>,
 
     ScrollableColumn(
         modifier = Modifier.fillMaxHeight()
-            .padding(10.dp)
+            .padding(10.dp).background(Color.LightGray)
     ) {
         history.forEach {
             HistoryEntry(it)

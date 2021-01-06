@@ -21,9 +21,6 @@ import java.nio.file.Path
 fun ShellTab(tabIndex: Int) {
     val selectedTabState = mutableStateOf(WindowState.shellStates[tabIndex])
 
-    WorkingDirectoryTitle(selectedTabState.value.currentWorkingDir)
-    Divider()
-
     Row(modifier = Modifier.padding(top = 5.dp)) {
         FileTree(selectedTabState.value.currentWorkingDir)
 
@@ -34,8 +31,8 @@ fun ShellTab(tabIndex: Int) {
             val newTabState = ShellTabData(newPath,
                 selectedTabState.value.historyItems.cloneAndAppend(historyItem, 50))
 
-            selectedTabState.value = newTabState
             WindowState.shellStates[tabIndex] = newTabState
+            selectedTabState.value = newTabState
         }
     }
 }
