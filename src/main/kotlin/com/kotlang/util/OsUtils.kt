@@ -29,7 +29,7 @@ fun runCommand(workingDir: Path, command: String, refreshShellTab: (Path, Histor
     var newPath = workingDir
 
     try {
-        val parts = command.split("\\s".toRegex())
+        val parts = command.split("\\s(?=(?:[^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*\$)".toRegex())
 
         if (parts[0] == "cd") {
             newPath = workingDir.changePath(Paths.get(parts[1]))
