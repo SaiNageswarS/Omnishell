@@ -1,5 +1,6 @@
 package com.kotlang.ui
 
+import androidx.compose.foundation.ClickableText
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -14,8 +15,11 @@ import java.nio.file.Path
 import java.util.stream.Collectors
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import com.kotlang.HistoryItem
 import org.apache.commons.io.FilenameUtils
+import kotlin.io.path.isDirectory
 
 @Composable
 fun FileIcon(fileDetail: Path) {
@@ -35,7 +39,7 @@ fun FileIcon(fileDetail: Path) {
 }
 
 @Composable
-fun FileTreeItem(fileDetail: Path) {
+fun FileTreeItem(fileDetail: Path, refreshShellTab: (Path, HistoryItem?) -> Unit) {
     var fileName = fileDetail.fileName.toString().take(18)
 
     if (fileDetail.fileName.toString().length > 18) {
@@ -44,18 +48,22 @@ fun FileTreeItem(fileDetail: Path) {
 
     Row( modifier = Modifier.padding(5.dp) ) {
         FileIcon(fileDetail)
-        Text(fileName)
+        ClickableText(AnnotatedString(fileName), onClick = {
+            if (Files.isDirectory(fileDetail)) {
+                refreshShellTab(fileDetail, null)
+            }
+        })
     }
 }
 
 @Composable
-fun FileTree(currentPath: Path) {
+fun FileTree(currentPath: Path, refreshShellTab: (Path, HistoryItem?) -> Unit) {
     val fileList = Files.list(currentPath)
         .collect(Collectors.toList())
 
     LazyColumnFor(items = fileList,
         modifier = Modifier.width(220.dp).fillMaxHeight(),
     ) { fileDetail ->
-        FileTreeItem(fileDetail)
+        FileTreeItem(fileDetail, refreshShellTab)
     }
 }

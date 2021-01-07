@@ -15,24 +15,31 @@ import com.kotlang.ui.FileTree
 import com.kotlang.ui.WorkingDirectoryTitle
 import com.kotlang.ui.shell.Shell
 import com.kotlang.util.cloneAndAppend
+import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.exists
+import kotlin.io.path.isDirectory
 
 @Composable
 fun ShellTab(tabIndex: Int) {
     val selectedTabState = mutableStateOf(WindowState.shellStates[tabIndex])
+    val refreshTab = { newPath: Path, historyItem: HistoryItem? ->
+        //refresh shell tab
+        val newHistoryItems = if (historyItem != null)
+            selectedTabState.value.historyItems.cloneAndAppend(historyItem, 50)
+        else
+            selectedTabState.value.historyItems
+
+        val newTabState = ShellTabData(newPath, newHistoryItems)
+        WindowState.shellStates[tabIndex] = newTabState
+        selectedTabState.value = newTabState
+    }
 
     Row(modifier = Modifier.padding(top = 5.dp)) {
-        FileTree(selectedTabState.value.currentWorkingDir)
+        FileTree(selectedTabState.value.currentWorkingDir, refreshTab)
 
         Shell(
             selectedTabState.value.currentWorkingDir,
-            selectedTabState.value.historyItems) { newPath: Path, historyItem: HistoryItem ->
-            //refresh shell tab
-            val newTabState = ShellTabData(newPath,
-                selectedTabState.value.historyItems.cloneAndAppend(historyItem, 50))
-
-            WindowState.shellStates[tabIndex] = newTabState
-            selectedTabState.value = newTabState
-        }
+            selectedTabState.value.historyItems, refreshTab)
     }
 }
