@@ -30,15 +30,15 @@ fun HistoryEntry(historyItem: HistoryItem) {
                 Text(historyItem.command, color = Color.Green)
             }
 
-            Text(historyItem.output?.sanitize() ?: "")
-            Text(historyItem.error?.sanitize() ?: "", color = Color.Red)
+            Text(historyItem.output.output?.sanitize() ?: "")
+            Text(historyItem.output.error?.sanitize() ?: "", color = Color.Red)
         }
     }
 }
 
 @Composable
 fun Shell(workingDir: Path, history: List<HistoryItem>,
-          refreshShellTab: (Path, HistoryItem) -> Unit) {
+          refreshShellTab: (HistoryItem) -> Unit) {
 
     ScrollableColumn(
         modifier = Modifier.fillMaxHeight()

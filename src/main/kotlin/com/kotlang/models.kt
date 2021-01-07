@@ -2,10 +2,15 @@ package com.kotlang
 
 import java.nio.file.Path
 
-data class HistoryItem(
-    val command: String,
+data class CommandOutput(
+    var path: Path,
     var output: String? = null,
     var error: String? = null
+)
+
+data class HistoryItem(
+    val command: String,
+    var output: CommandOutput
 )
 
 data class ShellTabData(

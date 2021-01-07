@@ -13,13 +13,33 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import com.kotlang.CommandOutput
 import com.kotlang.HistoryItem
-import com.kotlang.util.runCommand
+import com.kotlang.plugins.command.ChangeDirectory
+import com.kotlang.plugins.command.CommandPlugin
+import com.kotlang.plugins.command.DefaultCommand
 import java.nio.file.Path
 
+val commandPlugins = listOf<CommandPlugin>(ChangeDirectory())
+
+fun runCommand(workingDir: Path, command: String, refreshShellTab: (HistoryItem) -> Unit) {
+    val parts = command.split("\\s(?=(?:[^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*\$)".toRegex())
+    val historyItem = HistoryItem(command, CommandOutput(workingDir))
+
+    for (plugin in commandPlugins) {
+        if (plugin.command == parts[0]) {
+            historyItem.output = plugin.execute(workingDir, parts)
+            refreshShellTab(historyItem)
+            return
+        }
+    }
+
+    historyItem.output = DefaultCommand().execute(workingDir, parts)
+    refreshShellTab(historyItem)
+}
 
 @Composable
-fun Prompt(workingDir: Path, refreshShellTab: (Path, HistoryItem) -> Unit) {
+fun Prompt(workingDir: Path, refreshShellTab: (HistoryItem) -> Unit) {
     val command = remember { mutableStateOf("") }
 
     Card(
