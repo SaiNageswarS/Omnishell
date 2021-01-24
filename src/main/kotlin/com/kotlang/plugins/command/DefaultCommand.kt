@@ -4,12 +4,13 @@ import com.kotlang.CommandOutput
 import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 
-class DefaultCommand: CommandPlugin("") {
-    override fun execute(workingDir: Path, commandAndArguments: List<String>): CommandOutput {
+class DefaultCommand {
+    fun execute(workingDir: Path, commandAndArguments: List<String>): CommandOutput {
         val commandOutput = CommandOutput(workingDir, "", "")
 
         try {
-            val proc = ProcessBuilder(*commandAndArguments.toTypedArray())
+            val shellCommand = commandAndArguments.joinToString(separator = " ")
+            val proc = ProcessBuilder("/bin/sh", "-c", shellCommand)
                 .directory(workingDir.toFile())
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectError(ProcessBuilder.Redirect.PIPE)

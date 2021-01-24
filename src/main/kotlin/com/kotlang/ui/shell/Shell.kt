@@ -3,6 +3,7 @@ package com.kotlang.ui.shell
 import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
@@ -44,10 +45,10 @@ fun Shell(workingDir: Path, history: List<HistoryItem>,
         modifier = Modifier.fillMaxHeight()
             .padding(10.dp).background(Color.LightGray)
     ) {
+        Prompt(workingDir, refreshShellTab)
+
         history.forEach {
             HistoryEntry(it)
         }
-
-        Prompt(workingDir, refreshShellTab)
     }
 }

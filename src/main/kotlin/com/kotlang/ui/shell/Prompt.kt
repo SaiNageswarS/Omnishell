@@ -16,11 +16,12 @@ import androidx.compose.ui.unit.dp
 import com.kotlang.CommandOutput
 import com.kotlang.HistoryItem
 import com.kotlang.plugins.command.ChangeDirectory
+import com.kotlang.plugins.command.ClearCommand
 import com.kotlang.plugins.command.CommandPlugin
 import com.kotlang.plugins.command.DefaultCommand
 import java.nio.file.Path
 
-val commandPlugins = listOf<CommandPlugin>(ChangeDirectory())
+val commandPlugins = listOf<CommandPlugin>(ChangeDirectory(), ClearCommand())
 
 fun runCommand(workingDir: Path, command: String, refreshShellTab: (HistoryItem) -> Unit) {
     val parts = command.split("\\s(?=(?:[^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*\$)".toRegex())
