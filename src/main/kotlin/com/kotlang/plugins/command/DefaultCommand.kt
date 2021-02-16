@@ -1,8 +1,8 @@
 package com.kotlang.plugins.command
 
 import com.kotlang.CommandOutput
+import com.kotlang.util.gobbleStream
 import java.nio.file.Path
-import java.util.concurrent.TimeUnit
 
 class DefaultCommand {
     fun execute(workingDir: Path, commandAndArguments: List<String>): CommandOutput {
@@ -16,9 +16,18 @@ class DefaultCommand {
                 .redirectError(ProcessBuilder.Redirect.PIPE)
                 .start()
 
-            proc.waitFor(60, TimeUnit.MINUTES)
-            commandOutput.output = proc.inputStream.bufferedReader().readText()
-            commandOutput.error = proc.errorStream.bufferedReader().readText()
+            val outputBuffer = StringBuffer()
+            val errorBuffer = StringBuffer()
+
+            val streamTasks = listOf(
+                gobbleStream(proc.inputStream, outputBuffer),
+                gobbleStream(proc.errorStream, errorBuffer))
+
+            proc.waitFor()
+            streamTasks.forEach { it.join() }
+
+            commandOutput.output = outputBuffer.toString()
+            commandOutput.error = errorBuffer.toString()
         } catch (e: Exception) {
             commandOutput.error = e.message
             e.printStackTrace()

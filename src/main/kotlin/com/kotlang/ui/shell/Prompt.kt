@@ -19,6 +19,7 @@ import com.kotlang.plugins.command.ChangeDirectory
 import com.kotlang.plugins.command.ClearCommand
 import com.kotlang.plugins.command.CommandPlugin
 import com.kotlang.plugins.command.DefaultCommand
+import com.kotlang.util.sanitize
 import java.nio.file.Path
 
 val commandPlugins = listOf<CommandPlugin>(ChangeDirectory(), ClearCommand())
@@ -42,6 +43,14 @@ fun runCommand(workingDir: Path, command: String, refreshShellTab: (HistoryItem)
 @Composable
 fun Prompt(workingDir: Path, refreshShellTab: (HistoryItem) -> Unit) {
     val command = remember { mutableStateOf("") }
+    val commandOutput = mutableStateOf("")
+    val commandError = mutableStateOf("")
+
+
+    val refreshRunningProcessOutput = { output: String, error: String ->
+        commandOutput.value = output
+        commandError.value = error
+    }
 
     Card(
         shape = RoundedCornerShape(8.dp),
@@ -56,6 +65,8 @@ fun Prompt(workingDir: Path, refreshShellTab: (HistoryItem) -> Unit) {
                 if (it.endsWith("\n") && !command.value.endsWith("\\")) {
                     runCommand(workingDir, command.value, refreshShellTab)
                     command.value = ""
+                    commandOutput.value = ""
+                    commandError.value = ""
                 } else {
                     command.value = it
                 }
@@ -65,4 +76,6 @@ fun Prompt(workingDir: Path, refreshShellTab: (HistoryItem) -> Unit) {
             leadingIcon = { Text("~", color = Color.Blue) }
         )
     }
+    Text(commandOutput.value.sanitize() ?: "")
+    Text(commandError.value.sanitize() ?: "", color = Color.Red)
 }
