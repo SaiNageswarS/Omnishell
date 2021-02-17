@@ -5,14 +5,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.unit.dp
 import com.kotlang.state.ShellState
 import com.kotlang.state.WindowState
 import com.kotlang.ui.FileTree
 import com.kotlang.ui.shell.Shell
 
-@ExperimentalKeyInput
 @Composable
 fun ShellTab(tabIndex: Int) {
     val currentPath = mutableStateOf(WindowState.shellStates[tabIndex].currentWorkingDir)

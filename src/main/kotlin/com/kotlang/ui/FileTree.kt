@@ -1,8 +1,9 @@
 package com.kotlang.ui
 
-import androidx.compose.foundation.ClickableText
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumnFor
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.vectorXmlResource
@@ -29,6 +30,7 @@ fun FileIcon(fileDetail: Path) {
     }
 
     Icon(imageVector = vectorXmlResource(iconPath),
+        contentDescription = "",
          modifier = Modifier.width(18.dp))
 }
 
@@ -55,9 +57,11 @@ fun FileTree(currentPath: Path) {
     val fileList = Files.list(currentPath)
         .collect(Collectors.toList())
 
-    LazyColumnFor(items = fileList,
+    LazyColumn(
         modifier = Modifier.width(220.dp).fillMaxHeight(),
-    ) { fileDetail ->
-        FileTreeItem(fileDetail)
+    ) {
+        itemsIndexed(fileList) { _, fileItem ->
+            FileTreeItem(fileItem)
+        }
     }
 }

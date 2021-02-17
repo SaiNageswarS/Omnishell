@@ -1,5 +1,6 @@
 package com.kotlang.ui.shell
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,8 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.ExperimentalKeyInput
-import androidx.compose.ui.input.key.keyInputFilter
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.kotlang.CommandOutput
@@ -45,7 +45,6 @@ fun runCommand(workingDir: Path, command: String) {
     WindowState.selectedTab.addCommandOutput(historyItem)
 }
 
-@ExperimentalKeyInput
 @Composable
 fun Prompt(workingDir: Path) {
     val command = remember { mutableStateOf("") }
@@ -59,36 +58,37 @@ fun Prompt(workingDir: Path) {
         TextField(
             value = command.value,
             textStyle = TextStyle(color = Color.Green),
-            activeColor = Color.LightGray,
-            onValueChange = { command.value = it },
-            modifier = Modifier.fillMaxWidth().keyInputFilter {
-                when (it.key.keyCode) {
-                    UP_ARROW_KEY -> {
-                        historyIndex.value += 1
-                        WindowState.selectedTab.getLastCommand(historyIndex.value)?.let { lastCommand ->
-                            command.value = lastCommand
-                        }
-                        true
-                    }
-                    DOWN_ARROW_KEY -> {
-                        historyIndex.value -= 1
-                        WindowState.selectedTab.getLastCommand(historyIndex.value)?.let { lastCommand ->
-                            command.value = lastCommand
-                        }
-                        true
-                    }
-                    ENTER_KEY -> {
-                        if (!command.value.endsWith("\\") && command.value.trim().isNotEmpty()) {
-                            runCommand(workingDir, command.value)
-                            command.value = ""
-                            historyIndex.value = -1
+            onValueChange = { newVal: String -> command.value = newVal },
+            modifier = Modifier
+                .background(color = Color.White)
+                .fillMaxWidth()
+                .onKeyEvent {
+                    when (it.nativeKeyEvent.keyCode) {
+                        UP_ARROW_KEY -> {
+                            historyIndex.value += 1
+                            WindowState.selectedTab.getLastCommand(historyIndex.value)?.let { lastCommand ->
+                                command.value = lastCommand
+                            }
                             true
-                        } else false
+                        }
+                        DOWN_ARROW_KEY -> {
+                            historyIndex.value -= 1
+                            WindowState.selectedTab.getLastCommand(historyIndex.value)?.let { lastCommand ->
+                                command.value = lastCommand
+                            }
+                            true
+                        }
+                        ENTER_KEY -> {
+                            if (!command.value.endsWith("\\") && command.value.trim().isNotEmpty()) {
+                                runCommand(workingDir, command.value)
+                                command.value = ""
+                                historyIndex.value = -1
+                                true
+                            } else false
+                        }
+                        else -> false
                     }
-                    else -> false
-                }
-            },
-            backgroundColor = Color.Transparent,
+                },
             leadingIcon = { Text("~", color = Color.Blue) }
         )
     }

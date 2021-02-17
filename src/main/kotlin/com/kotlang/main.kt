@@ -6,14 +6,12 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.input.key.ExperimentalKeyInput
 import com.kotlang.state.WindowState
 import com.kotlang.ui.WorkingDirectoryTitle
 import com.kotlang.ui.tabs.AddNewTabButton
 import com.kotlang.ui.tabs.ShellTab
 import com.kotlang.ui.tabs.TabHeader
 
-@ExperimentalKeyInput
 @Composable
 fun OmnishellWindow() {
     val selectedTab = remember { mutableStateOf(0) }
@@ -42,7 +40,6 @@ fun OmnishellWindow() {
     }
 }
 
-@ExperimentalKeyInput
 fun main() = Window(title = "OmniShell") {
     MaterialTheme {
         OmnishellWindow()

@@ -1,16 +1,15 @@
 package com.kotlang.ui.shell
 
-import androidx.compose.foundation.ScrollableColumn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.unit.dp
 import com.kotlang.HistoryItem
 import com.kotlang.util.sanitize
@@ -38,18 +37,19 @@ fun HistoryEntry(historyItem: HistoryItem) {
     }
 }
 
-@ExperimentalKeyInput
 @Composable
 fun Shell(workingDir: Path, history: List<HistoryItem>) {
 
-    ScrollableColumn(
+    Column(
         modifier = Modifier.fillMaxHeight()
             .padding(10.dp).background(Color.LightGray)
     ) {
         Prompt(workingDir)
 
-        history.forEach {
-            HistoryEntry(it)
+        LazyColumn {
+            itemsIndexed(history) { _, historyItem ->
+                HistoryEntry(historyItem)
+            }
         }
     }
 }
