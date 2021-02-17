@@ -1,6 +1,5 @@
 package com.kotlang.util
 
-import com.kotlang.state.ActiveShellState
 import java.io.InputStream
 import java.util.*
 

@@ -1,29 +1,32 @@
 package com.kotlang.state
 
-import com.kotlang.ShellTabData
-
 object WindowState {
-    val shellStates = mutableListOf(ShellTabData(), ShellTabData())
+    val shellStates = mutableListOf(ShellState(index = 0), ShellState(index = 1))
     lateinit var changeTabUICb: (Int) -> Unit
 
-    var selectedTabIndex: Int = 0
+    var selectedTab: ShellState = shellStates[0]
         set(value) {
             field = value
-            changeTabUICb(value)
+            changeTabUICb(value.index)
         }
 
     fun changeTab(newTabIndex: Int) {
-        selectedTabIndex = newTabIndex
+        selectedTab = shellStates[newTabIndex]
     }
 
     fun closeTab(tabIndex: Int) {
         shellStates.removeAt(tabIndex)
-        val newTabIndex = if (selectedTabIndex == tabIndex) 0 else selectedTabIndex
-        selectedTabIndex = newTabIndex
+        //re-assign tab indices
+        for (i in shellStates.indices) {
+            shellStates[i].index = i
+        }
+        val newTabIndex = if (selectedTab.index == tabIndex) 0 else selectedTab.index
+        selectedTab = shellStates[newTabIndex]
     }
 
     fun addTab() {
-        shellStates.add(ShellTabData())
-        selectedTabIndex = shellStates.size - 1
+        val newTab = ShellState(index = shellStates.size)
+        shellStates.add(newTab)
+        selectedTab = newTab
     }
 }

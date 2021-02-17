@@ -21,7 +21,6 @@ import com.kotlang.plugins.command.ChangeDirectory
 import com.kotlang.plugins.command.ClearCommand
 import com.kotlang.plugins.command.CommandPlugin
 import com.kotlang.plugins.command.DefaultCommand
-import com.kotlang.state.ActiveShellState
 import com.kotlang.state.WindowState
 import java.nio.file.Path
 
@@ -32,18 +31,18 @@ const val ENTER_KEY = 10
 
 fun runCommand(workingDir: Path, command: String) {
     val parts = command.split("\\s(?=(?:[^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*\$)".toRegex())
-    val historyItem = HistoryItem(command, CommandOutput(workingDir))
+    val historyItem = HistoryItem(command, CommandOutput())
 
     for (plugin in commandPlugins) {
         if (plugin.command == parts[0]) {
             historyItem.output = plugin.execute(workingDir, parts)
-            ActiveShellState.addCommandOutput(historyItem)
+            WindowState.selectedTab.addCommandOutput(historyItem)
             return
         }
     }
 
     historyItem.output = DefaultCommand().execute(workingDir, parts)
-    ActiveShellState.addCommandOutput(historyItem)
+    WindowState.selectedTab.addCommandOutput(historyItem)
 }
 
 @ExperimentalKeyInput
@@ -66,14 +65,14 @@ fun Prompt(workingDir: Path) {
                 when (it.key.keyCode) {
                     UP_ARROW_KEY -> {
                         historyIndex.value += 1
-                        ActiveShellState.getLastCommand(historyIndex.value)?.let { lastCommand ->
+                        WindowState.selectedTab.getLastCommand(historyIndex.value)?.let { lastCommand ->
                             command.value = lastCommand
                         }
                         true
                     }
                     DOWN_ARROW_KEY -> {
                         historyIndex.value -= 1
-                        ActiveShellState.getLastCommand(historyIndex.value)?.let { lastCommand ->
+                        WindowState.selectedTab.getLastCommand(historyIndex.value)?.let { lastCommand ->
                             command.value = lastCommand
                         }
                         true

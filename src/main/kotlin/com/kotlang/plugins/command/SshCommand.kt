@@ -13,6 +13,6 @@ class SshCommand: CommandPlugin("ssh") {
         val user = userHost[0].split(":")[0]
 //        val password = user
 
-        return CommandOutput(Path.of(""))
+        return CommandOutput()
     }
 }

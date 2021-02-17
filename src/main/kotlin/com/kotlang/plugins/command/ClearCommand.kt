@@ -5,7 +5,7 @@ import java.nio.file.Path
 
 class ClearCommand: CommandPlugin("clear") {
     override fun execute(workingDir: Path, commandAndArguments: List<String>): CommandOutput {
-        return CommandOutput(workingDir, "", "")
+        return CommandOutput("", "")
     }
 
 }

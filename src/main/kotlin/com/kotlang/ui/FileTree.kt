@@ -12,6 +12,7 @@ import java.util.stream.Collectors
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import com.kotlang.state.WindowState
 import org.apache.commons.io.FilenameUtils
 
 @Composable
@@ -32,7 +33,7 @@ fun FileIcon(fileDetail: Path) {
 }
 
 @Composable
-fun FileTreeItem(fileDetail: Path, changePath: (Path) -> Unit) {
+fun FileTreeItem(fileDetail: Path) {
     var fileName = fileDetail.fileName.toString().take(18)
 
     if (fileDetail.fileName.toString().length > 18) {
@@ -43,20 +44,20 @@ fun FileTreeItem(fileDetail: Path, changePath: (Path) -> Unit) {
         FileIcon(fileDetail)
         ClickableText(AnnotatedString(fileName), onClick = {
             if (Files.isDirectory(fileDetail)) {
-                changePath(fileDetail)
+                WindowState.selectedTab.changePath(fileDetail)
             }
         })
     }
 }
 
 @Composable
-fun FileTree(currentPath: Path, changePath: (Path) -> Unit) {
+fun FileTree(currentPath: Path) {
     val fileList = Files.list(currentPath)
         .collect(Collectors.toList())
 
     LazyColumnFor(items = fileList,
         modifier = Modifier.width(220.dp).fillMaxHeight(),
     ) { fileDetail ->
-        FileTreeItem(fileDetail, changePath)
+        FileTreeItem(fileDetail)
     }
 }

@@ -6,7 +6,7 @@ import java.nio.file.Path
 
 class DefaultCommand {
     fun execute(workingDir: Path, commandAndArguments: List<String>): CommandOutput {
-        val commandOutput = CommandOutput(workingDir, "", "")
+        val commandOutput = CommandOutput("", "")
 
         try {
             val shellCommand = commandAndArguments.joinToString(separator = " ")

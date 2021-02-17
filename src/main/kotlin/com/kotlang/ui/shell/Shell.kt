@@ -10,6 +10,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.ExperimentalKeyInput
 import androidx.compose.ui.unit.dp
 import com.kotlang.HistoryItem
 import com.kotlang.util.sanitize
@@ -37,6 +38,7 @@ fun HistoryEntry(historyItem: HistoryItem) {
     }
 }
 
+@ExperimentalKeyInput
 @Composable
 fun Shell(workingDir: Path, history: List<HistoryItem>) {
 
