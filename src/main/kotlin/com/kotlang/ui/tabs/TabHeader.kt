@@ -16,32 +16,33 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.kotlang.state.WindowState
 
 @Composable
-fun ShellTabRowItem(title: String, selected: Boolean,
-                    index: Int, close: (Int) -> Unit, changeTab: (Int) -> Unit) {
+fun TabHeader(title: String, selected: Boolean, index: Int) {
     Tab(
         selected = selected,
-        onClick = { changeTab(index) }
+        onClick = { WindowState.changeTab(index) }
     ) {
         Row {
             Text(title, modifier = Modifier.padding(5.dp))
+            //close tab button
             Icon(
                 Icons.Default.Close, tint = AmbientContentColor.current, modifier = Modifier
                     .size(24.dp)
                     .padding(5.dp)
                     .clickable {
-                        close(index)
+                        WindowState.closeTab(index)
                     })
         }
     }
 }
 
 @Composable
-fun AddTabItem(addTab: () -> Unit) {
+fun AddNewTabButton() {
     Tab(
         selected = false,
-        onClick = addTab,
+        onClick = { WindowState.addTab() },
         modifier = Modifier.background(Color.LightGray).size(50.dp)
     ) {
         Icon(

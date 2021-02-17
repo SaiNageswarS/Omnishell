@@ -6,23 +6,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.kotlang.HistoryItem
 import com.kotlang.ShellTabData
-import com.kotlang.WindowState
+import com.kotlang.state.ActiveShellState
+import com.kotlang.state.WindowState
 import com.kotlang.ui.FileTree
 import com.kotlang.ui.shell.Shell
-import com.kotlang.util.cloneAndAppend
 
 @Composable
 fun ShellTab(tabIndex: Int) {
     val selectedTabState = mutableStateOf(WindowState.shellStates[tabIndex])
-    val refreshTab = { historyItem: HistoryItem ->
-        //refresh shell tab
-        val newHistoryItems = selectedTabState.value.historyItems
-            .cloneAndAppend(historyItem, 50)
-
-        val newTabState = ShellTabData(historyItem.output.path, newHistoryItems)
-        WindowState.shellStates[tabIndex] = newTabState
+    ActiveShellState.refreshShellTabUICb = { newTabState: ShellTabData ->
         selectedTabState.value = newTabState
     }
 
@@ -34,6 +27,6 @@ fun ShellTab(tabIndex: Int) {
 
         Shell(
             selectedTabState.value.currentWorkingDir,
-            selectedTabState.value.historyItems, refreshTab)
+            selectedTabState.value.historyItems)
     }
 }

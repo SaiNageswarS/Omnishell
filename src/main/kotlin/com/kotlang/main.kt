@@ -5,22 +5,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material.*
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import com.kotlang.state.WindowState
 import com.kotlang.ui.WorkingDirectoryTitle
-import com.kotlang.ui.tabs.AddTabItem
+import com.kotlang.ui.tabs.AddNewTabButton
 import com.kotlang.ui.tabs.ShellTab
-import com.kotlang.ui.tabs.ShellTabRowItem
-
-object WindowState {
-    val shellStates = mutableListOf(ShellTabData(), ShellTabData())
-}
+import com.kotlang.ui.tabs.TabHeader
 
 fun main() = Window(title = "OmniShell") {
     val selectedTab = remember { mutableStateOf(0) }
-    val changeTab = { tabIndex: Int -> selectedTab.value = tabIndex }
-    val closeTab = { tabIndex: Int ->
-        WindowState.shellStates.removeAt(tabIndex)
-        selectedTab.value = if (selectedTab.value == tabIndex) 0 else selectedTab.value
-    }
+    WindowState.changeTabUICb = { tabIndex: Int -> selectedTab.value = tabIndex }
 
     MaterialTheme {
         Column {
@@ -30,16 +23,14 @@ fun main() = Window(title = "OmniShell") {
             ScrollableTabRow(
                 selectedTabIndex = selectedTab.value,
                 tabs = {
+                    //add current tabs
                     for (i in WindowState.shellStates.indices) {
                         val windowTitle = WindowState.shellStates[i]
                             .currentWorkingDir.fileName.toString()
-                        ShellTabRowItem(windowTitle,
-                            selectedTab.value == i, i, closeTab, changeTab)
+                        TabHeader(windowTitle, selectedTab.value == i, i)
                     }
-                    AddTabItem {
-                        WindowState.shellStates.add(ShellTabData())
-                        selectedTab.value = WindowState.shellStates.size - 1;
-                    }
+                    //button to add new tab
+                    AddNewTabButton()
                 }
             )
 

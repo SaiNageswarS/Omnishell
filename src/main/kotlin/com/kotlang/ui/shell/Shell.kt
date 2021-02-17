@@ -38,14 +38,13 @@ fun HistoryEntry(historyItem: HistoryItem) {
 }
 
 @Composable
-fun Shell(workingDir: Path, history: List<HistoryItem>,
-          refreshShellTab: (HistoryItem) -> Unit) {
+fun Shell(workingDir: Path, history: List<HistoryItem>) {
 
     ScrollableColumn(
         modifier = Modifier.fillMaxHeight()
             .padding(10.dp).background(Color.LightGray)
     ) {
-        Prompt(workingDir, refreshShellTab)
+        Prompt(workingDir)
 
         history.forEach {
             HistoryEntry(it)

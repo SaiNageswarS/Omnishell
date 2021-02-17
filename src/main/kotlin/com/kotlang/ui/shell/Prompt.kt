@@ -19,29 +19,30 @@ import com.kotlang.plugins.command.ChangeDirectory
 import com.kotlang.plugins.command.ClearCommand
 import com.kotlang.plugins.command.CommandPlugin
 import com.kotlang.plugins.command.DefaultCommand
+import com.kotlang.state.ActiveShellState
 import com.kotlang.util.sanitize
 import java.nio.file.Path
 
 val commandPlugins = listOf<CommandPlugin>(ChangeDirectory(), ClearCommand())
 
-fun runCommand(workingDir: Path, command: String, refreshShellTab: (HistoryItem) -> Unit) {
+fun runCommand(workingDir: Path, command: String) {
     val parts = command.split("\\s(?=(?:[^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*\$)".toRegex())
     val historyItem = HistoryItem(command, CommandOutput(workingDir))
 
     for (plugin in commandPlugins) {
         if (plugin.command == parts[0]) {
             historyItem.output = plugin.execute(workingDir, parts)
-            refreshShellTab(historyItem)
+            ActiveShellState.addCommandOutput(historyItem)
             return
         }
     }
 
     historyItem.output = DefaultCommand().execute(workingDir, parts)
-    refreshShellTab(historyItem)
+    ActiveShellState.addCommandOutput(historyItem)
 }
 
 @Composable
-fun Prompt(workingDir: Path, refreshShellTab: (HistoryItem) -> Unit) {
+fun Prompt(workingDir: Path) {
     val command = remember { mutableStateOf("") }
     val commandOutput = mutableStateOf("")
     val commandError = mutableStateOf("")
@@ -63,7 +64,7 @@ fun Prompt(workingDir: Path, refreshShellTab: (HistoryItem) -> Unit) {
             activeColor = Color.LightGray,
             onValueChange = {
                 if (it.endsWith("\n") && !command.value.endsWith("\\")) {
-                    runCommand(workingDir, command.value, refreshShellTab)
+                    runCommand(workingDir, command.value)
                     command.value = ""
                     commandOutput.value = ""
                     commandError.value = ""
