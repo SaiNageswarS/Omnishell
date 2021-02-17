@@ -11,6 +11,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.ExperimentalKeyInput
+import androidx.compose.ui.input.key.keyInputFilter
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.kotlang.CommandOutput
@@ -20,10 +22,13 @@ import com.kotlang.plugins.command.ClearCommand
 import com.kotlang.plugins.command.CommandPlugin
 import com.kotlang.plugins.command.DefaultCommand
 import com.kotlang.state.ActiveShellState
-import com.kotlang.util.sanitize
+import com.kotlang.state.WindowState
 import java.nio.file.Path
 
 val commandPlugins = listOf<CommandPlugin>(ChangeDirectory(), ClearCommand())
+const val UP_ARROW_KEY = 38
+const val DOWN_ARROW_KEY = 40
+const val ENTER_KEY = 10
 
 fun runCommand(workingDir: Path, command: String) {
     val parts = command.split("\\s(?=(?:[^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*\$)".toRegex())
@@ -41,17 +46,11 @@ fun runCommand(workingDir: Path, command: String) {
     ActiveShellState.addCommandOutput(historyItem)
 }
 
+@ExperimentalKeyInput
 @Composable
 fun Prompt(workingDir: Path) {
     val command = remember { mutableStateOf("") }
-    val commandOutput = mutableStateOf("")
-    val commandError = mutableStateOf("")
-
-
-    val refreshRunningProcessOutput = { output: String, error: String ->
-        commandOutput.value = output
-        commandError.value = error
-    }
+    val historyIndex = remember { mutableStateOf(-1) }
 
     Card(
         shape = RoundedCornerShape(8.dp),
@@ -62,21 +61,36 @@ fun Prompt(workingDir: Path) {
             value = command.value,
             textStyle = TextStyle(color = Color.Green),
             activeColor = Color.LightGray,
-            onValueChange = {
-                if (it.endsWith("\n") && !command.value.endsWith("\\")) {
-                    runCommand(workingDir, command.value)
-                    command.value = ""
-                    commandOutput.value = ""
-                    commandError.value = ""
-                } else {
-                    command.value = it
+            onValueChange = { command.value = it },
+            modifier = Modifier.fillMaxWidth().keyInputFilter {
+                when (it.key.keyCode) {
+                    UP_ARROW_KEY -> {
+                        historyIndex.value += 1
+                        ActiveShellState.getLastCommand(historyIndex.value)?.let { lastCommand ->
+                            command.value = lastCommand
+                        }
+                        true
+                    }
+                    DOWN_ARROW_KEY -> {
+                        historyIndex.value -= 1
+                        ActiveShellState.getLastCommand(historyIndex.value)?.let { lastCommand ->
+                            command.value = lastCommand
+                        }
+                        true
+                    }
+                    ENTER_KEY -> {
+                        if (!command.value.endsWith("\\") && command.value.trim().isNotEmpty()) {
+                            runCommand(workingDir, command.value)
+                            command.value = ""
+                            historyIndex.value = -1
+                            true
+                        } else false
+                    }
+                    else -> false
                 }
             },
-            modifier = Modifier.fillMaxWidth(),
             backgroundColor = Color.Transparent,
             leadingIcon = { Text("~", color = Color.Blue) }
         )
     }
-    Text(commandOutput.value.sanitize() ?: "")
-    Text(commandError.value.sanitize() ?: "", color = Color.Red)
 }
