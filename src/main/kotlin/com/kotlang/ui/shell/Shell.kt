@@ -1,23 +1,20 @@
 package com.kotlang.ui.shell
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.Card
-import androidx.compose.material.Divider
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.kotlang.HistoryItem
 import com.kotlang.actions.ShellActions
 import com.kotlang.ui.Chip
+import com.kotlang.ui.Dialogs
+import com.kotlang.ui.PromptIcon
 import com.kotlang.util.sanitize
 import java.net.InetAddress
 import java.nio.file.Path
@@ -35,8 +32,8 @@ class Shell(private val shellActions: ShellActions) {
                 modifier = Modifier.padding(10.dp)
             ) {
                 Row {
-                    Text("~  ", color = Color.Blue)
-                    Text(historyItem.command, color = Color.Green)
+                    PromptIcon()
+                    Text(historyItem.command, color = Color.DarkGray)
                 }
 
                 Text(historyItem.output.output?.sanitize() ?: "")
@@ -61,7 +58,9 @@ class Shell(private val shellActions: ShellActions) {
             Chip("$currentPath") {}
             Spacer(Modifier.width(30.dp))
 
-            Chip("Environment") {}
+            Chip("Environment") {
+                Dialogs.toggleEnvironmentDialog(true)
+            }
         }
     }
 

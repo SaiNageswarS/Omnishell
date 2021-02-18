@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
@@ -14,12 +15,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kotlang.HistoryItem
 import com.kotlang.plugins.command.ChangeDirectory
 import com.kotlang.plugins.command.ClearCommand
 import com.kotlang.plugins.command.DefaultCommand
 import com.kotlang.actions.ShellActions
+import com.kotlang.ui.PromptIcon
 import java.nio.file.Path
 
 val commandPlugins = listOf(ChangeDirectory(), ClearCommand(),
@@ -52,7 +56,7 @@ class Prompt(private val shellActions: ShellActions) {
         ) {
             TextField(
                 value = command.value,
-                textStyle = TextStyle(color = Color.Green),
+                textStyle = TextStyle(color = Color.DarkGray),
                 onValueChange = { newVal: String -> command.value = newVal },
                 modifier = Modifier
                     .background(color = Color.White)
@@ -84,7 +88,7 @@ class Prompt(private val shellActions: ShellActions) {
                             else -> false
                         }
                     },
-                leadingIcon = { Text("~", color = Color.Blue) }
+                leadingIcon = { PromptIcon() }
             )
         }
     }

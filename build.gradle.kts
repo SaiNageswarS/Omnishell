@@ -21,6 +21,7 @@ dependencies {
     // https://mvnrepository.com/artifact/commons-io/commons-io
     implementation("commons-io:commons-io:2.8.0")
     implementation("com.jcraft:jsch:0.1.55")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.+")
 }
 
 tasks.withType<KotlinCompile>() {

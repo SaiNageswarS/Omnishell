@@ -6,7 +6,9 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.window.Dialog
 import com.kotlang.actions.WindowActions
+import com.kotlang.ui.Dialogs
 import com.kotlang.ui.WindowTitle
 import com.kotlang.ui.tabs.ShellTab
 import com.kotlang.ui.tabs.TabHeader
@@ -45,6 +47,7 @@ fun OmnishellWindow() {
 
         ShellTab(windowActions).ShellTabWidget(selectedTab.value)
     }
+    Dialogs.AddDialogs()
 }
 
 fun main() = Window(title = "OmniShell") {
