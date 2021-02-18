@@ -12,13 +12,10 @@ import java.net.InetAddress
 import java.nio.file.Path
 
 @Composable
-fun WorkingDirectoryTitle(currentPath: Path) {
-    val hostName = InetAddress.getLocalHost().hostName
-    val userName = System.getProperty("user.name")
-
+fun WindowTitle() {
     TopAppBar {
         Text(
-            "$userName@$hostName:$currentPath",
+            "OmniShell",
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth().padding(10.dp))
     }

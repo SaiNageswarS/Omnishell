@@ -1,18 +1,25 @@
 package com.kotlang.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.vectorXmlResource
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.stream.Collectors
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kotlang.actions.ShellActions
 import org.apache.commons.io.FilenameUtils
 
@@ -32,7 +39,9 @@ class FileTree(private val shellActions: ShellActions) {
 
         Icon(imageVector = vectorXmlResource(iconPath),
             contentDescription = "",
-            modifier = Modifier.width(18.dp))
+            modifier = Modifier.width(18.dp),
+            tint = MaterialTheme.colors.secondaryVariant
+        )
     }
 
     @Composable
@@ -43,13 +52,18 @@ class FileTree(private val shellActions: ShellActions) {
             fileName = fileName.replaceRange(15, 17, ".")
         }
 
-        Row( modifier = Modifier.padding(5.dp) ) {
+        Row( modifier = Modifier.padding(7.dp) ) {
             FileIcon(fileDetail)
-            ClickableText(AnnotatedString(fileName), onClick = {
-                if (Files.isDirectory(fileDetail)) {
-                    shellActions.changePath(fileDetail)
-                }
-            })
+            ClickableText(
+                AnnotatedString(fileName),
+                onClick = {
+                    if (Files.isDirectory(fileDetail)) {
+                        shellActions.changePath(fileDetail)
+                    }
+                },
+                modifier = Modifier.padding(horizontal = 5.dp, vertical = 0.dp),
+                style = TextStyle(color = Color.White)
+            )
         }
     }
 
@@ -58,11 +72,23 @@ class FileTree(private val shellActions: ShellActions) {
         val fileList = Files.list(currentPath)
             .collect(Collectors.toList())
 
-        LazyColumn(
-            modifier = Modifier.width(220.dp).fillMaxHeight(),
-        ) {
-            itemsIndexed(fileList) { _, fileItem ->
-                FileTreeItem(fileItem)
+        Column {
+            Text(
+                modifier = Modifier.padding(horizontal = 0.dp, vertical = 16.dp),
+                text = "FOLDERS",
+                style = TextStyle(
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold
+                ),
+                color = Color.White
+            )
+
+            LazyColumn(
+                modifier = Modifier.width(220.dp).fillMaxHeight(),
+            ) {
+                itemsIndexed(fileList) { _, fileItem ->
+                    FileTreeItem(fileItem)
+                }
             }
         }
     }

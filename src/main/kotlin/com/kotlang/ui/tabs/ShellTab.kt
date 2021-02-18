@@ -1,10 +1,12 @@
 package com.kotlang.ui.tabs
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.kotlang.ShellState
 import com.kotlang.actions.ShellActions
@@ -24,7 +26,7 @@ class ShellTab(private val windowActions: WindowActions) {
         }
 
         val shellActions = ShellActions(windowActions.shellStates[tabIndex], refreshShellTabUICb)
-        Row(modifier = Modifier.padding(top = 5.dp)) {
+        Row(modifier = Modifier.background(Color(red = 34, green = 51, blue = 68))) {
             FileTree(shellActions).FileTreeWidget(currentPath.value)
             Shell(shellActions).ShellWidget(currentPath.value, commandHistory.value)
         }

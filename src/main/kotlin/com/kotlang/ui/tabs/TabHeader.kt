@@ -1,19 +1,16 @@
 package com.kotlang.ui.tabs
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.Icon
-import androidx.compose.material.Tab
-import androidx.compose.material.Text
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.kotlang.actions.WindowActions
 
@@ -25,32 +22,31 @@ class TabHeader(private val windowActions: WindowActions) {
             onClick = { windowActions.changeTab(index) }
         ) {
             Row {
-                Text(title, modifier = Modifier.padding(5.dp))
+                Text(title, modifier = Modifier.padding(vertical = 10.dp))
                 //close tab button
-                Icon(
-                    Icons.Default.Close,
-                    contentDescription = "",
-                    modifier = Modifier
-                        .size(24.dp)
-                        .padding(5.dp)
-                        .clickable {
-                            windowActions.closeTab(index)
-                        })
+                IconButton(onClick = { windowActions.closeTab(index) }) {
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = "",
+                        modifier = Modifier
+                            .size(30.dp)
+                            .padding(horizontal=0.dp, vertical=5.dp))
+                }
             }
         }
     }
 
     @Composable
     fun AddNewTabButton() {
-        Tab(
-            selected = false,
+        IconButton(
             onClick = { windowActions.addTab() },
-            modifier = Modifier.background(Color.LightGray).size(50.dp)
         ) {
             Icon(
                 Icons.Default.Add, contentDescription = "", modifier = Modifier
-                    .size(30.dp)
-                    .padding(5.dp))
+                    .size(40.dp)
+                    .padding(5.dp)
+                    .background(MaterialTheme.colors.secondaryVariant)
+            )
         }
     }
 }

@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.kotlang.actions.WindowActions
-import com.kotlang.ui.WorkingDirectoryTitle
+import com.kotlang.ui.WindowTitle
 import com.kotlang.ui.tabs.ShellTab
 import com.kotlang.ui.tabs.TabHeader
 
@@ -28,8 +28,7 @@ fun OmnishellWindow() {
 
     val tabHeader = TabHeader(windowActions)
     Column {
-        WorkingDirectoryTitle(windowActions.selectedTab.currentWorkingDir)
-
+        WindowTitle()
         ScrollableTabRow(
             selectedTabIndex = selectedTab.value,
             tabs = {

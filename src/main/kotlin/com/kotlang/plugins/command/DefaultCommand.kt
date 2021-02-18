@@ -12,12 +12,15 @@ class DefaultCommand: CommandPlugin(".*") {
         val commandOutput = CommandOutput("", "")
 
         try {
-            val proc = ProcessBuilder("/bin/sh", "-c", commandAndArgsStmt)
+            val procBuilder = ProcessBuilder("/bin/sh", "-c", commandAndArgsStmt)
                 .directory(workingDir.toFile())
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectError(ProcessBuilder.Redirect.PIPE)
-                .start()
 
+            val environment = procBuilder.environment()
+            println(environment)
+
+            val proc = procBuilder.start()
             val outputBuffer = StringBuffer()
             val errorBuffer = StringBuffer()
 
