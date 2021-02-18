@@ -12,43 +12,46 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.kotlang.HistoryItem
+import com.kotlang.actions.ShellActions
 import com.kotlang.util.sanitize
 import java.nio.file.Path
 
-@Composable
-fun HistoryEntry(historyItem: HistoryItem) {
-    Card(
-        shape = RoundedCornerShape(8.dp),
-        backgroundColor = Color.White,
-        modifier = Modifier.fillMaxWidth().padding(10.dp)
-    ) {
-        //command
-        Column(
-            modifier = Modifier.padding(10.dp)
+class Shell(private val shellActions: ShellActions) {
+    @Composable
+    private fun HistoryEntry(historyItem: HistoryItem) {
+        Card(
+            shape = RoundedCornerShape(8.dp),
+            backgroundColor = Color.White,
+            modifier = Modifier.fillMaxWidth().padding(10.dp)
         ) {
-            Row {
-                Text("~  ", color = Color.Blue)
-                Text(historyItem.command, color = Color.Green)
-            }
+            //command
+            Column(
+                modifier = Modifier.padding(10.dp)
+            ) {
+                Row {
+                    Text("~  ", color = Color.Blue)
+                    Text(historyItem.command, color = Color.Green)
+                }
 
-            Text(historyItem.output.output?.sanitize() ?: "")
-            Text(historyItem.output.error?.sanitize() ?: "", color = Color.Red)
+                Text(historyItem.output.output?.sanitize() ?: "")
+                Text(historyItem.output.error?.sanitize() ?: "", color = Color.Red)
+            }
         }
     }
-}
 
-@Composable
-fun Shell(workingDir: Path, history: List<HistoryItem>) {
+    @Composable
+    fun ShellWidget(workingDir: Path, history: List<HistoryItem>) {
 
-    Column(
-        modifier = Modifier.fillMaxHeight()
-            .padding(10.dp).background(Color.LightGray)
-    ) {
-        Prompt(workingDir)
+        Column(
+            modifier = Modifier.fillMaxHeight()
+                .padding(10.dp).background(Color.LightGray)
+        ) {
+            Prompt(shellActions).PromptWidget(workingDir)
 
-        LazyColumn {
-            itemsIndexed(history) { _, historyItem ->
-                HistoryEntry(historyItem)
+            LazyColumn {
+                itemsIndexed(history) { _, historyItem ->
+                    HistoryEntry(historyItem)
+                }
             }
         }
     }

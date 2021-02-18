@@ -13,55 +13,57 @@ import java.util.stream.Collectors
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
-import com.kotlang.state.WindowState
+import com.kotlang.actions.ShellActions
 import org.apache.commons.io.FilenameUtils
 
-@Composable
-fun FileIcon(fileDetail: Path) {
-    val extension = if (Files.isDirectory(fileDetail)) "folder"
+class FileTree(private val shellActions: ShellActions) {
+    @Composable
+    private fun FileIcon(fileDetail: Path) {
+        val extension = if (Files.isDirectory(fileDetail)) "folder"
         else FilenameUtils.getExtension(fileDetail.toString())
 
-    val iconPath = when(extension) {
-        "folder" -> "images/folder_black_18dp.xml"
-        "jpg", "svg", "png" -> "images/image_black_18dp.xml"
-        "mp3", "wav" -> "music_note_black_18dp.xml"
-        "pdf" -> "picture_as_pdf_black_18dp.xml"
-        else -> "images/text_snippet_black_18dp.xml"
+        val iconPath = when(extension) {
+            "folder" -> "images/folder_black_18dp.xml"
+            "jpg", "svg", "png" -> "images/image_black_18dp.xml"
+            "mp3", "wav" -> "music_note_black_18dp.xml"
+            "pdf" -> "picture_as_pdf_black_18dp.xml"
+            else -> "images/text_snippet_black_18dp.xml"
+        }
+
+        Icon(imageVector = vectorXmlResource(iconPath),
+            contentDescription = "",
+            modifier = Modifier.width(18.dp))
     }
 
-    Icon(imageVector = vectorXmlResource(iconPath),
-        contentDescription = "",
-         modifier = Modifier.width(18.dp))
-}
+    @Composable
+    private fun FileTreeItem(fileDetail: Path) {
+        var fileName = fileDetail.fileName.toString().take(18)
 
-@Composable
-fun FileTreeItem(fileDetail: Path) {
-    var fileName = fileDetail.fileName.toString().take(18)
+        if (fileDetail.fileName.toString().length > 18) {
+            fileName = fileName.replaceRange(15, 17, ".")
+        }
 
-    if (fileDetail.fileName.toString().length > 18) {
-        fileName = fileName.replaceRange(15, 17, ".")
+        Row( modifier = Modifier.padding(5.dp) ) {
+            FileIcon(fileDetail)
+            ClickableText(AnnotatedString(fileName), onClick = {
+                if (Files.isDirectory(fileDetail)) {
+                    shellActions.changePath(fileDetail)
+                }
+            })
+        }
     }
 
-    Row( modifier = Modifier.padding(5.dp) ) {
-        FileIcon(fileDetail)
-        ClickableText(AnnotatedString(fileName), onClick = {
-            if (Files.isDirectory(fileDetail)) {
-                WindowState.selectedTab.changePath(fileDetail)
+    @Composable
+    fun FileTreeWidget(currentPath: Path) {
+        val fileList = Files.list(currentPath)
+            .collect(Collectors.toList())
+
+        LazyColumn(
+            modifier = Modifier.width(220.dp).fillMaxHeight(),
+        ) {
+            itemsIndexed(fileList) { _, fileItem ->
+                FileTreeItem(fileItem)
             }
-        })
-    }
-}
-
-@Composable
-fun FileTree(currentPath: Path) {
-    val fileList = Files.list(currentPath)
-        .collect(Collectors.toList())
-
-    LazyColumn(
-        modifier = Modifier.width(220.dp).fillMaxHeight(),
-    ) {
-        itemsIndexed(fileList) { _, fileItem ->
-            FileTreeItem(fileItem)
         }
     }
 }

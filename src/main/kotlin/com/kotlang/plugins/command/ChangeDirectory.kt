@@ -1,16 +1,18 @@
 package com.kotlang.plugins.command
 
 import com.kotlang.CommandOutput
-import com.kotlang.state.WindowState
+import com.kotlang.plugins.CommandPlugin
+import com.kotlang.actions.ShellActions
 import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
-class ChangeDirectory: CommandPlugin("cd") {
-    override fun execute(workingDir: Path,
-                         commandAndArguments: List<String>): CommandOutput {
+class ChangeDirectory: CommandPlugin("cd\\s.*") {
+    override fun execute(workingDir: Path, commandAndArgsStmt: String,
+                         shellActions: ShellActions): CommandOutput {
         var result = CommandOutput("", "", )
+        val commandAndArguments = commandAndArgsStmt.split("\\s(?=(?:[^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*\$)".toRegex())
 
         if (commandAndArguments.size > 1) {
             val destination = Paths.get(commandAndArguments[1])
@@ -26,7 +28,7 @@ class ChangeDirectory: CommandPlugin("cd") {
                 result = CommandOutput( "", "Path does not exist.")
                 return result
             }
-            WindowState.selectedTab.changePath(newPath)
+            shellActions.changePath(newPath)
         }
 
         return result

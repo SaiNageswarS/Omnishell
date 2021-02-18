@@ -1,16 +1,18 @@
 package com.kotlang.plugins.command
 
 import com.kotlang.CommandOutput
+import com.kotlang.plugins.CommandPlugin
+import com.kotlang.actions.ShellActions
 import com.kotlang.util.gobbleStream
 import java.nio.file.Path
 
-class DefaultCommand {
-    fun execute(workingDir: Path, commandAndArguments: List<String>): CommandOutput {
+class DefaultCommand: CommandPlugin(".*") {
+    override fun execute(workingDir: Path, commandAndArgsStmt: String,
+                shellActions: ShellActions): CommandOutput {
         val commandOutput = CommandOutput("", "")
 
         try {
-            val shellCommand = commandAndArguments.joinToString(separator = " ")
-            val proc = ProcessBuilder("/bin/sh", "-c", shellCommand)
+            val proc = ProcessBuilder("/bin/sh", "-c", commandAndArgsStmt)
                 .directory(workingDir.toFile())
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectError(ProcessBuilder.Redirect.PIPE)

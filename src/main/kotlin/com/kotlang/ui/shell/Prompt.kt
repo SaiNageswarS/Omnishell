@@ -15,81 +15,77 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import com.kotlang.CommandOutput
 import com.kotlang.HistoryItem
 import com.kotlang.plugins.command.ChangeDirectory
 import com.kotlang.plugins.command.ClearCommand
-import com.kotlang.plugins.command.CommandPlugin
 import com.kotlang.plugins.command.DefaultCommand
-import com.kotlang.state.WindowState
+import com.kotlang.actions.ShellActions
 import java.nio.file.Path
 
-val commandPlugins = listOf<CommandPlugin>(ChangeDirectory(), ClearCommand())
+val commandPlugins = listOf(ChangeDirectory(), ClearCommand(),
+    DefaultCommand())
+
 const val UP_ARROW_KEY = 38
 const val DOWN_ARROW_KEY = 40
 const val ENTER_KEY = 10
 
-fun runCommand(workingDir: Path, command: String) {
-    val parts = command.split("\\s(?=(?:[^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*\$)".toRegex())
-    val historyItem = HistoryItem(command, CommandOutput())
-
-    for (plugin in commandPlugins) {
-        if (plugin.command == parts[0]) {
-            historyItem.output = plugin.execute(workingDir, parts)
-            WindowState.selectedTab.addCommandOutput(historyItem)
-            return
+class Prompt(private val shellActions: ShellActions) {
+    private fun runCommand(workingDir: Path, command: String) {
+        for (plugin in commandPlugins) {
+            if (plugin.match(command)) {
+                val output = plugin.execute(workingDir, command, shellActions)
+                shellActions.addCommandOutput(HistoryItem(command, output))
+                return
+            }
         }
     }
 
-    historyItem.output = DefaultCommand().execute(workingDir, parts)
-    WindowState.selectedTab.addCommandOutput(historyItem)
-}
+    @Composable
+    fun PromptWidget(workingDir: Path) {
+        val command = remember { mutableStateOf("") }
+        val historyIndex = remember { mutableStateOf(-1) }
 
-@Composable
-fun Prompt(workingDir: Path) {
-    val command = remember { mutableStateOf("") }
-    val historyIndex = remember { mutableStateOf(-1) }
-
-    Card(
-        shape = RoundedCornerShape(8.dp),
-        backgroundColor = Color.White,
-        modifier = Modifier.fillMaxWidth().padding(10.dp)
-    ) {
-        TextField(
-            value = command.value,
-            textStyle = TextStyle(color = Color.Green),
-            onValueChange = { newVal: String -> command.value = newVal },
-            modifier = Modifier
-                .background(color = Color.White)
-                .fillMaxWidth()
-                .onKeyEvent {
-                    when (it.nativeKeyEvent.keyCode) {
-                        UP_ARROW_KEY -> {
-                            historyIndex.value += 1
-                            WindowState.selectedTab.getLastCommand(historyIndex.value)?.let { lastCommand ->
-                                command.value = lastCommand
-                            }
-                            true
-                        }
-                        DOWN_ARROW_KEY -> {
-                            historyIndex.value -= 1
-                            WindowState.selectedTab.getLastCommand(historyIndex.value)?.let { lastCommand ->
-                                command.value = lastCommand
-                            }
-                            true
-                        }
-                        ENTER_KEY -> {
-                            if (!command.value.endsWith("\\") && command.value.trim().isNotEmpty()) {
-                                runCommand(workingDir, command.value)
-                                command.value = ""
-                                historyIndex.value = -1
+        Card(
+            shape = RoundedCornerShape(8.dp),
+            backgroundColor = Color.White,
+            modifier = Modifier.fillMaxWidth().padding(10.dp)
+        ) {
+            TextField(
+                value = command.value,
+                textStyle = TextStyle(color = Color.Green),
+                onValueChange = { newVal: String -> command.value = newVal },
+                modifier = Modifier
+                    .background(color = Color.White)
+                    .fillMaxWidth()
+                    .onKeyEvent {
+                        when (it.nativeKeyEvent.keyCode) {
+                            UP_ARROW_KEY -> {
+                                historyIndex.value += 1
+                                shellActions.getLastCommand(historyIndex.value)?.let { lastCommand ->
+                                    command.value = lastCommand
+                                }
                                 true
-                            } else false
+                            }
+                            DOWN_ARROW_KEY -> {
+                                historyIndex.value -= 1
+                                shellActions.getLastCommand(historyIndex.value)?.let { lastCommand ->
+                                    command.value = lastCommand
+                                }
+                                true
+                            }
+                            ENTER_KEY -> {
+                                if (!command.value.endsWith("\\") && command.value.trim().isNotEmpty()) {
+                                    runCommand(workingDir, command.value)
+                                    command.value = ""
+                                    historyIndex.value = -1
+                                    true
+                                } else false
+                            }
+                            else -> false
                         }
-                        else -> false
-                    }
-                },
-            leadingIcon = { Text("~", color = Color.Blue) }
-        )
+                    },
+                leadingIcon = { Text("~", color = Color.Blue) }
+            )
+        }
     }
 }

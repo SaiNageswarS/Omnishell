@@ -1,9 +1,9 @@
-package com.kotlang.state
+package com.kotlang.actions
 
-object WindowState {
-    val shellStates = mutableListOf(ShellState(index = 0), ShellState(index = 1))
-    lateinit var changeTabUICb: (Int) -> Unit
+import com.kotlang.ShellState
 
+class WindowActions(val shellStates: MutableList<ShellState>,
+                    private val changeTabUICb: (Int) -> Unit) {
     var selectedTab: ShellState = shellStates[0]
         set(value) {
             field = value
