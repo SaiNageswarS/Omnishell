@@ -4,14 +4,8 @@ import com.kotlang.ShellState
 
 class WindowActions(val shellStates: MutableList<ShellState>,
                     private val changeTabUICb: (Int) -> Unit) {
-    var selectedTab: ShellState = shellStates[0]
-        set(value) {
-            field = value
-            changeTabUICb(value.index)
-        }
-
     fun changeTab(newTabIndex: Int) {
-        selectedTab = shellStates[newTabIndex]
+        changeTabUICb(newTabIndex)
     }
 
     fun closeTab(tabIndex: Int) {
@@ -20,13 +14,13 @@ class WindowActions(val shellStates: MutableList<ShellState>,
         for (i in shellStates.indices) {
             shellStates[i].index = i
         }
-        val newTabIndex = if (selectedTab.index == tabIndex) 0 else selectedTab.index
-        selectedTab = shellStates[newTabIndex]
+        val newTabIndex = 0
+        changeTabUICb(newTabIndex)
     }
 
     fun addTab() {
         val newTab = ShellState(index = shellStates.size)
         shellStates.add(newTab)
-        selectedTab = newTab
+        changeTabUICb(newTab.index)
     }
 }

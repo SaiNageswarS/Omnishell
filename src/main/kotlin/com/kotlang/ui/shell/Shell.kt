@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Warning
@@ -17,15 +16,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.kotlang.CommandState
 import com.kotlang.HistoryItem
-import com.kotlang.actions.ShellActions
+import com.kotlang.ShellState
 import com.kotlang.ui.Chip
-import com.kotlang.ui.Dialogs
+import com.kotlang.ui.EnvironmentDialog
 import com.kotlang.ui.PromptIcon
 import com.kotlang.util.sanitize
 import java.net.InetAddress
 import java.nio.file.Path
 
-class Shell(private val shellActions: ShellActions) {
+class Shell(private val shellState: ShellState) {
     @Composable
     private fun CommandStateIcon(historyItem: HistoryItem) {
         when(historyItem.output.state) {
@@ -42,7 +41,7 @@ class Shell(private val shellActions: ShellActions) {
     }
 
     @Composable
-    private fun HistoryEntry(historyItem: HistoryItem) {
+    private fun HistoryEntry(historyItem: HistoryItem, shellStateVersion: Int) {
         Card(
             shape = RoundedCornerShape(8.dp),
             backgroundColor = Color.White,
@@ -53,11 +52,12 @@ class Shell(private val shellActions: ShellActions) {
                 modifier = Modifier.padding(10.dp)
             ) {
                 Row(modifier = Modifier.fillMaxWidth()) {
-                    Row(modifier = Modifier.fillMaxWidth(0.97f)) {
+                    Row(modifier = Modifier.fillMaxWidth(0.93f)) {
                         PromptIcon()
                         Text(historyItem.command, color = Color.DarkGray)
                     }
                     CommandStateIcon(historyItem)
+                    Text(shellStateVersion.toString())
                 }
 
                 Text(historyItem.output.output.sanitize(), color = Color.DarkGray)
@@ -67,7 +67,7 @@ class Shell(private val shellActions: ShellActions) {
     }
 
     @Composable
-    private fun EnvironmentInfoChips(currentPath: Path) {
+    private fun EnvironmentInfoChips() {
         val hostName = InetAddress.getLocalHost().hostName
         val userName = System.getProperty("user.name")
 
@@ -79,32 +79,32 @@ class Shell(private val shellActions: ShellActions) {
             Chip(hostName) {}
             Spacer(Modifier.width(30.dp))
 
-            Chip("$currentPath") {}
+            Chip("${shellState.currentWorkingDir}") {}
             Spacer(Modifier.width(30.dp))
 
             Chip("Environment") {
-                Dialogs.toggleEnvironmentDialog(true)
+                EnvironmentDialog()
             }
         }
     }
 
     @Composable
-    fun ShellWidget(workingDir: Path, history: List<HistoryItem>) {
+    fun ShellWidget(shellStateVersion: Int) {
 
         Column(
             modifier = Modifier.fillMaxHeight()
                 .padding(10.dp)
         ) {
-            Prompt(shellActions).PromptWidget(workingDir)
+            Prompt(shellState).PromptWidget()
 
             LazyColumn(modifier = Modifier.fillMaxHeight(0.88f)) {
-                itemsIndexed(history) { _, historyItem ->
-                    HistoryEntry(historyItem)
+                itemsIndexed(shellState.historyItems) { _, historyItem ->
+                    HistoryEntry(historyItem, shellStateVersion)
                 }
             }
 
             Divider(color = Color.LightGray)
-            EnvironmentInfoChips(workingDir)
+            EnvironmentInfoChips()
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.kotlang
 
+import com.kotlang.ui.tabs.refreshShell
 import java.nio.file.Path
 import java.util.*
 
@@ -18,9 +19,33 @@ data class HistoryItem(
     val output: CommandOutput
 )
 
-data class ShellState(
-    var currentWorkingDir: Path = Path.of(System.getProperty("user.home")),
-    var historyItems: List<HistoryItem> = listOf(),
+class ShellState(
+    var historyItems: MutableList<HistoryItem> = mutableListOf(),
     var index: Int = 0,
+    var shellStateVersion: Int = 0,
     val id: String = UUID.randomUUID().toString()
-)
+) {
+    var currentWorkingDir: Path = Path.of(System.getProperty("user.home"))
+        set(value) {
+            field = value
+            refreshShell()
+        }
+
+    fun getLastCommand(index: Int): String? {
+        if (index < 0 || index >= historyItems.size) {
+            return null
+        }
+
+        return historyItems[index].command
+    }
+
+    fun addCommandOutput(historyItem: HistoryItem) {
+        historyItems.add(0, historyItem)
+        refreshShell()
+    }
+
+    fun clearHistory() {
+        historyItems = mutableListOf()
+        refreshShell()
+    }
+}

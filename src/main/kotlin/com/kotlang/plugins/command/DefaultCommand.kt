@@ -2,14 +2,15 @@ package com.kotlang.plugins.command
 
 import com.kotlang.CommandState
 import com.kotlang.HistoryItem
+import com.kotlang.ShellState
 import com.kotlang.plugins.CommandPlugin
-import com.kotlang.actions.ShellActions
+import com.kotlang.ui.tabs.refreshShell
 import com.kotlang.util.gobbleStream
 import java.nio.file.Path
 
 class DefaultCommand: CommandPlugin(".*") {
     override fun execute(workingDir: Path, commandAndArgsStmt: String,
-                shellActions: ShellActions, historyItem: HistoryItem) {
+                shellActions: ShellState, historyItem: HistoryItem) {
         val commandOutput = historyItem.output
 
         try {
@@ -38,6 +39,7 @@ class DefaultCommand: CommandPlugin(".*") {
                 0 -> CommandState.SUCCESS
                 else -> CommandState.FAILED
             }
+            refreshShell()
         } catch (e: Exception) {
             commandOutput.error = e.message ?: "Failed"
             e.printStackTrace()

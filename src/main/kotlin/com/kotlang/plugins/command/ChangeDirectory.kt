@@ -1,10 +1,9 @@
 package com.kotlang.plugins.command
 
-import com.kotlang.CommandOutput
 import com.kotlang.CommandState
 import com.kotlang.HistoryItem
+import com.kotlang.ShellState
 import com.kotlang.plugins.CommandPlugin
-import com.kotlang.actions.ShellActions
 import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
@@ -12,7 +11,7 @@ import java.nio.file.Paths
 
 class ChangeDirectory: CommandPlugin("cd\\s.*") {
     override fun execute(workingDir: Path, commandAndArgsStmt: String,
-                         shellActions: ShellActions, historyItem: HistoryItem) {
+                         shellActions: ShellState, historyItem: HistoryItem) {
         var result = historyItem.output
         val commandAndArguments = commandAndArgsStmt.split("\\s(?=(?:[^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*\$)".toRegex())
 
@@ -31,7 +30,7 @@ class ChangeDirectory: CommandPlugin("cd\\s.*") {
                 result.state = CommandState.FAILED
                 return
             }
-            shellActions.changePath(newPath)
+            shellActions.currentWorkingDir = newPath
         }
 
         result.state = CommandState.SUCCESS

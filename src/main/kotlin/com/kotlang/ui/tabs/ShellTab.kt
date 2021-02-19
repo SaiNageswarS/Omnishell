@@ -2,35 +2,35 @@ package com.kotlang.ui.tabs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import com.kotlang.ShellState
-import com.kotlang.actions.ShellActions
-import com.kotlang.actions.WindowActions
 import com.kotlang.ui.FileTree
 import com.kotlang.ui.shell.Shell
 
-class ShellTab(private val windowActions: WindowActions) {
-    @Composable
-    fun ShellTabWidget(tabIndex: Int) {
-        val currentPath = mutableStateOf(windowActions.shellStates[tabIndex].currentWorkingDir)
-        val commandHistory = mutableStateOf(windowActions.shellStates[tabIndex].historyItems)
+var shellRefreshCount = 0
+lateinit var refreshShellTabUICb: (Int) -> Unit
 
-        val refreshShellTabUICb = { newTabState: ShellState ->
-            if (newTabState.id == windowActions.shellStates[tabIndex].id) {
-                currentPath.value = newTabState.currentWorkingDir
-                commandHistory.value = newTabState.historyItems
-            }
+fun refreshShell() {
+    refreshShellTabUICb(++shellRefreshCount)
+}
+
+class ShellTab(private val shellState: ShellState) {
+    @Composable
+    fun ShellTabWidget() {
+        val shellStateVersion = remember { mutableStateOf(shellState.shellStateVersion) }
+
+        refreshShellTabUICb = { refreshCnt: Int ->
+            //update ui only if state changed in active tab.
+            shellStateVersion.value = refreshCnt
         }
 
-        val shellActions = ShellActions(windowActions.shellStates[tabIndex], refreshShellTabUICb)
         Row(modifier = Modifier.background(Color(red = 34, green = 51, blue = 68))) {
-            FileTree(shellActions).FileTreeWidget(currentPath.value)
-            Shell(shellActions).ShellWidget(currentPath.value, commandHistory.value)
+            FileTree(shellState).FileTreeWidget()
+            Shell(shellState).ShellWidget(shellStateVersion.value)
         }
     }
 }

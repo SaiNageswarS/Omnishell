@@ -6,9 +6,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.window.Dialog
 import com.kotlang.actions.WindowActions
-import com.kotlang.ui.Dialogs
 import com.kotlang.ui.WindowTitle
 import com.kotlang.ui.tabs.ShellTab
 import com.kotlang.ui.tabs.TabHeader
@@ -35,9 +33,9 @@ fun OmnishellWindow() {
             selectedTabIndex = selectedTab.value,
             tabs = {
                 //add current tabs
-                for (i in windowActions.shellStates.indices) {
-                    val windowTitle = windowActions.shellStates[i]
-                        .currentWorkingDir.fileName.toString()
+                for (i in shellTabs.indices) {
+                    val windowTitle = shellTabs[i].currentWorkingDir
+                        .fileName.toString()
                     tabHeader.TabHeader(windowTitle, selectedTab.value == i, i)
                 }
                 //button to add new tab
@@ -45,9 +43,8 @@ fun OmnishellWindow() {
             }
         )
 
-        ShellTab(windowActions).ShellTabWidget(selectedTab.value)
+        ShellTab(shellTabs[selectedTab.value]).ShellTabWidget()
     }
-    Dialogs.AddDialogs()
 }
 
 fun main() = Window(title = "OmniShell") {
