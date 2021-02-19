@@ -15,8 +15,6 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.kotlang.CommandOutput
-import com.kotlang.HistoryItem
-import com.kotlang.ShellState
 import com.kotlang.plugins.command.ChangeDirectory
 import com.kotlang.plugins.command.ClearCommand
 import com.kotlang.plugins.command.DefaultCommand
@@ -29,21 +27,21 @@ const val UP_ARROW_KEY = 38
 const val DOWN_ARROW_KEY = 40
 const val ENTER_KEY = 10
 
-class Prompt(private val shellState: ShellState) {
+class Prompt(private val shell: Shell) {
     private fun runCommand(command: String) {
-        val cmdRes = HistoryItem(command, CommandOutput())
+        val cmdRes = CommandOutputCard(command, CommandOutput())
+        shell.addCommandOutput(cmdRes)
 
         for (plugin in commandPlugins) {
             if (plugin.match(command)) {
-                Thread { plugin.execute(shellState.currentWorkingDir, command, shellState, cmdRes) }.start()
-                shellState.addCommandOutput(cmdRes)
+                Thread { plugin.execute(shell.currentWorkingDir, command, shell, cmdRes) }.start()
                 return
             }
         }
     }
 
     @Composable
-    fun PromptWidget() {
+    fun Draw() {
         val command = remember { mutableStateOf("") }
         val historyIndex = remember { mutableStateOf(-1) }
 
@@ -63,14 +61,14 @@ class Prompt(private val shellState: ShellState) {
                         when (it.nativeKeyEvent.keyCode) {
                             UP_ARROW_KEY -> {
                                 historyIndex.value += 1
-                                shellState.getLastCommand(historyIndex.value)?.let { lastCommand ->
+                                shell.getCommandAtIndex(historyIndex.value)?.let { lastCommand ->
                                     command.value = lastCommand
                                 }
                                 true
                             }
                             DOWN_ARROW_KEY -> {
                                 historyIndex.value -= 1
-                                shellState.getLastCommand(historyIndex.value)?.let { lastCommand ->
+                                shell.getCommandAtIndex(historyIndex.value)?.let { lastCommand ->
                                     command.value = lastCommand
                                 }
                                 true

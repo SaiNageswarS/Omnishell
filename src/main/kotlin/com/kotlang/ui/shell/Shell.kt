@@ -3,67 +3,38 @@ package com.kotlang.ui.shell
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.kotlang.CommandState
-import com.kotlang.HistoryItem
-import com.kotlang.ShellState
 import com.kotlang.ui.Chip
 import com.kotlang.ui.EnvironmentDialog
-import com.kotlang.ui.PromptIcon
-import com.kotlang.util.sanitize
+import com.kotlang.ui.window.refreshShell
 import java.net.InetAddress
 import java.nio.file.Path
 
-class Shell(private val shellState: ShellState) {
-    @Composable
-    private fun CommandStateIcon(historyItem: HistoryItem) {
-        when(historyItem.output.state) {
-            CommandState.RUNNING ->
-                Icon(Icons.Default.Refresh, contentDescription = "",
-                    modifier = Modifier.size(25.dp))
-            CommandState.SUCCESS ->
-                Icon(Icons.Filled.CheckCircle, contentDescription = "",
-                    modifier = Modifier.size(25.dp), tint = Color.Green)
-            CommandState.FAILED ->
-                Icon(Icons.Filled.Warning, contentDescription = "",
-                    modifier = Modifier.size(25.dp), tint = Color.Red)
+class Shell(var commandOutputCards: MutableList<CommandOutputCard> = mutableListOf(),
+            var currentWorkingDir: Path = Path.of(System.getProperty("user.home")),
+            var index: Int = 0) {
+
+    fun getCommandAtIndex(index: Int): String? {
+        if (index < 0 || index >= commandOutputCards.size) {
+            return null
         }
+
+        return commandOutputCards[index].command
     }
 
-    @Composable
-    private fun HistoryEntry(historyItem: HistoryItem, shellStateVersion: Int) {
-        Card(
-            shape = RoundedCornerShape(8.dp),
-            backgroundColor = Color.White,
-            modifier = Modifier.fillMaxWidth().padding(10.dp)
-        ) {
-            //command
-            Column(
-                modifier = Modifier.padding(10.dp)
-            ) {
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    Row(modifier = Modifier.fillMaxWidth(0.93f)) {
-                        PromptIcon()
-                        Text(historyItem.command, color = Color.DarkGray)
-                    }
-                    CommandStateIcon(historyItem)
-                    Text(shellStateVersion.toString())
-                }
+    fun addCommandOutput(commandOutput: CommandOutputCard) {
+        commandOutputCards.add(0, commandOutput)
+        refreshShell()
+    }
 
-                Text(historyItem.output.output.sanitize(), color = Color.DarkGray)
-                Text(historyItem.output.error.sanitize(), color = Color.Red)
-            }
-        }
+    fun clearHistory() {
+        commandOutputCards = mutableListOf()
+        refreshShell()
     }
 
     @Composable
@@ -79,7 +50,7 @@ class Shell(private val shellState: ShellState) {
             Chip(hostName) {}
             Spacer(Modifier.width(30.dp))
 
-            Chip("${shellState.currentWorkingDir}") {}
+            Chip("$currentWorkingDir") {}
             Spacer(Modifier.width(30.dp))
 
             Chip("Environment") {
@@ -89,17 +60,18 @@ class Shell(private val shellState: ShellState) {
     }
 
     @Composable
-    fun ShellWidget(shellStateVersion: Int) {
+    fun Draw(shellStateVersion: Int) {
+        val shell = this
 
         Column(
             modifier = Modifier.fillMaxHeight()
                 .padding(10.dp)
         ) {
-            Prompt(shellState).PromptWidget()
+            Prompt(shell).Draw()
 
             LazyColumn(modifier = Modifier.fillMaxHeight(0.88f)) {
-                itemsIndexed(shellState.historyItems) { _, historyItem ->
-                    HistoryEntry(historyItem, shellStateVersion)
+                itemsIndexed(commandOutputCards) { _, outputCard ->
+                    outputCard.Draw(shellStateVersion)
                 }
             }
 

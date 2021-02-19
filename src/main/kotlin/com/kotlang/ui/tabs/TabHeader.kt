@@ -12,9 +12,9 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.kotlang.actions.WindowActions
+import com.kotlang.ui.window.OmnishellWindow
 
-class TabHeader(private val windowActions: WindowActions) {
+class TabHeader(private val windowActions: OmnishellWindow) {
     @Composable
     fun TabHeader(title: String, selected: Boolean, index: Int) {
         Tab(

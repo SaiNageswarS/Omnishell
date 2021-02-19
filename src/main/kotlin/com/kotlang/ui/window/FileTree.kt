@@ -1,4 +1,4 @@
-package com.kotlang.ui
+package com.kotlang.ui.window
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,10 +19,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kotlang.ShellState
 import org.apache.commons.io.FilenameUtils
 
-class FileTree(private val shellState: ShellState) {
+class FileTree() {
     @Composable
     private fun FileIcon(fileDetail: Path) {
         val extension = if (Files.isDirectory(fileDetail)) "folder"
@@ -57,7 +56,7 @@ class FileTree(private val shellState: ShellState) {
                 AnnotatedString(fileName),
                 onClick = {
                     if (Files.isDirectory(fileDetail)) {
-                        shellState.currentWorkingDir = fileDetail
+                        changePathUiCb(fileDetail)
                     }
                 },
                 modifier = Modifier.padding(horizontal = 5.dp, vertical = 0.dp),
@@ -67,8 +66,8 @@ class FileTree(private val shellState: ShellState) {
     }
 
     @Composable
-    fun FileTreeWidget() {
-        val fileList = Files.list(shellState.currentWorkingDir)
+    fun FileTreeWidget(currentWorkingDir: Path) {
+        val fileList = Files.list(currentWorkingDir)
             .collect(Collectors.toList())
 
         Column {
