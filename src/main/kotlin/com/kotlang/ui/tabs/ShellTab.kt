@@ -21,8 +21,10 @@ class ShellTab(private val windowActions: WindowActions) {
         val commandHistory = mutableStateOf(windowActions.shellStates[tabIndex].historyItems)
 
         val refreshShellTabUICb = { newTabState: ShellState ->
-            currentPath.value = newTabState.currentWorkingDir
-            commandHistory.value = newTabState.historyItems
+            if (newTabState.id == windowActions.shellStates[tabIndex].id) {
+                currentPath.value = newTabState.currentWorkingDir
+                commandHistory.value = newTabState.historyItems
+            }
         }
 
         val shellActions = ShellActions(windowActions.shellStates[tabIndex], refreshShellTabUICb)

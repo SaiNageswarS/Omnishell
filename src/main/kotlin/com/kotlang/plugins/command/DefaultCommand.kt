@@ -1,6 +1,7 @@
 package com.kotlang.plugins.command
 
-import com.kotlang.CommandOutput
+import com.kotlang.CommandState
+import com.kotlang.HistoryItem
 import com.kotlang.plugins.CommandPlugin
 import com.kotlang.actions.ShellActions
 import com.kotlang.util.gobbleStream
@@ -8,8 +9,8 @@ import java.nio.file.Path
 
 class DefaultCommand: CommandPlugin(".*") {
     override fun execute(workingDir: Path, commandAndArgsStmt: String,
-                shellActions: ShellActions): CommandOutput {
-        val commandOutput = CommandOutput("", "")
+                shellActions: ShellActions, historyItem: HistoryItem) {
+        val commandOutput = historyItem.output
 
         try {
             val procBuilder = ProcessBuilder("/bin/sh", "-c", commandAndArgsStmt)
@@ -33,11 +34,13 @@ class DefaultCommand: CommandPlugin(".*") {
 
             commandOutput.output = outputBuffer.toString()
             commandOutput.error = errorBuffer.toString()
+            commandOutput.state = when(proc.exitValue()) {
+                0 -> CommandState.SUCCESS
+                else -> CommandState.FAILED
+            }
         } catch (e: Exception) {
-            commandOutput.error = e.message
+            commandOutput.error = e.message ?: "Failed"
             e.printStackTrace()
         }
-
-        return commandOutput
     }
 }

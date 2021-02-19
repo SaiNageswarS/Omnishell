@@ -18,6 +18,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kotlang.CommandOutput
 import com.kotlang.HistoryItem
 import com.kotlang.plugins.command.ChangeDirectory
 import com.kotlang.plugins.command.ClearCommand
@@ -35,10 +36,12 @@ const val ENTER_KEY = 10
 
 class Prompt(private val shellActions: ShellActions) {
     private fun runCommand(workingDir: Path, command: String) {
+        val cmdRes = HistoryItem(command, CommandOutput())
+
         for (plugin in commandPlugins) {
             if (plugin.match(command)) {
-                val output = plugin.execute(workingDir, command, shellActions)
-                shellActions.addCommandOutput(HistoryItem(command, output))
+                plugin.execute(workingDir, command, shellActions, cmdRes)
+                shellActions.addCommandOutput(cmdRes)
                 return
             }
         }
