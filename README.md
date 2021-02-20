@@ -1,6 +1,6 @@
 # Omnishell
 
-Modern shell combining the flexibility of graphics interface with the power of shell. Works with mac and linux.
+Modern shell combining the flexibility of graphical interface with the power of shell. Works with mac and linux.
 
 ## Sample Screens
 
