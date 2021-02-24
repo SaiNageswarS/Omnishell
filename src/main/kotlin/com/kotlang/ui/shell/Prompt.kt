@@ -15,13 +15,8 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.kotlang.CommandOutput
-import com.kotlang.plugins.command.ChangeDirectory
-import com.kotlang.plugins.command.ClearCommand
-import com.kotlang.plugins.command.DefaultCommand
+import com.kotlang.plugins.CommandPlugin
 import com.kotlang.ui.PromptIcon
-
-val commandPlugins = listOf(ChangeDirectory(), ClearCommand(),
-    DefaultCommand())
 
 const val UP_ARROW_KEY = 38
 const val DOWN_ARROW_KEY = 40
@@ -32,12 +27,12 @@ class Prompt(private val shell: Shell) {
         val cmdRes = CommandOutputCard(command, CommandOutput())
         shell.addCommandOutput(cmdRes)
 
-        for (plugin in commandPlugins) {
-            if (plugin.match(command)) {
-                Thread { plugin.execute(shell.currentWorkingDir, command, shell, cmdRes) }.start()
-                return
-            }
-        }
+        val plugin = CommandPlugin.getPlugin(command)
+        Thread {
+            //wait for initialization of command card UI callbacks
+            Thread.sleep(500)
+            plugin.execute(shell.currentWorkingDir, command, shell, cmdRes)
+        }.start()
     }
 
     @Composable

@@ -30,6 +30,8 @@ tasks.withType<KotlinCompile>() {
 
 compose.desktop {
     application {
+        javaHome = System.getenv("JDK_15")
+
         mainClass = "MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
