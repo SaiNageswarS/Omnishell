@@ -4,7 +4,7 @@ import com.kotlang.plugins.command.ChangeDirectory
 import com.kotlang.plugins.command.ClearCommand
 import com.kotlang.plugins.command.DefaultCommand
 import com.kotlang.plugins.command.SshCommand
-import com.kotlang.ui.shell.CommandOutputCard
+import com.kotlang.ui.shell.CommandExecutionCard
 import com.kotlang.ui.shell.Shell
 import java.nio.file.Path
 
@@ -12,7 +12,7 @@ abstract class CommandPlugin(command: String) {
     private val commandRegex = command.toRegex()
 
     abstract fun execute(workingDir: Path, commandAndArgsStmt: String,
-                         shellActions: Shell, commandOutputCard: CommandOutputCard)
+                         shellActions: Shell, commandExecutionCard: CommandExecutionCard)
 
     fun match(inputCmd: String): Boolean {
         //not working in mac

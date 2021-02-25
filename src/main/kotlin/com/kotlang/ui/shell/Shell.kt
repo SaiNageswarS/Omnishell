@@ -15,25 +15,25 @@ import com.kotlang.ui.window.refreshShell
 import java.net.InetAddress
 import java.nio.file.Path
 
-class Shell(var commandOutputCards: MutableList<CommandOutputCard> = mutableListOf(),
+class Shell(var commandExecutionCards: MutableList<CommandExecutionCard> = mutableListOf(),
             var currentWorkingDir: Path = Path.of(System.getProperty("user.home")),
             var index: Int = 0) {
 
     fun getCommandAtIndex(index: Int): String? {
-        if (index < 0 || index >= commandOutputCards.size) {
+        if (index < 0 || index >= commandExecutionCards.size) {
             return null
         }
 
-        return commandOutputCards[index].command
+        return commandExecutionCards[index].command
     }
 
-    fun addCommandOutput(commandOutput: CommandOutputCard) {
-        commandOutputCards.add(0, commandOutput)
+    fun addCommandExecution(commandExecution: CommandExecutionCard) {
+        commandExecutionCards.add(0, commandExecution)
         refreshShell()
     }
 
     fun clearHistory() {
-        commandOutputCards = mutableListOf()
+        commandExecutionCards = mutableListOf()
         refreshShell()
     }
 
@@ -70,7 +70,7 @@ class Shell(var commandOutputCards: MutableList<CommandOutputCard> = mutableList
             Prompt(shell).Draw()
 
             LazyColumn(modifier = Modifier.fillMaxHeight(0.88f)) {
-                itemsIndexed(commandOutputCards) { _, outputCard ->
+                itemsIndexed(commandExecutionCards) { _, outputCard ->
                     outputCard.Draw(shellStateVersion)
                 }
             }

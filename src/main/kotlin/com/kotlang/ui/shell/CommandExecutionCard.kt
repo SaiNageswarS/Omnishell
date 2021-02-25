@@ -11,45 +11,76 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.kotlang.CommandOutput
 import com.kotlang.CommandState
+import com.kotlang.formatters.ErrorText
+import com.kotlang.formatters.Node
+import com.kotlang.formatters.PlainText
 import com.kotlang.ui.PromptIcon
+import com.kotlang.util.Ticker
 import com.kotlang.util.sanitize
+import java.util.*
 
-class CommandOutputCard(val command: String,
-                        val output: CommandOutput) {
-    lateinit var refreshCommandOutput: () -> Unit
+class CommandExecutionCard(val command: String) {
+    private val state = mutableStateOf(CommandState.RUNNING)
+    val refreshState: (CommandState) -> Unit = {
+        //if execution is finished, stop the ticker
+        if (it == CommandState.FAILED || it == CommandState.SUCCESS) {
+            ticker!!.stop()
+        }
+        state.value = it
+    }
+
+    private val document = Collections.synchronizedList(
+        mutableListOf<Node>())
+    val appendOutput: (Node) -> Unit = { document.add(it) }
+
+    //polling document for output
+    private var ticker: Ticker? = null
 
     @Composable
-    private fun CommandStateIcon() {
-        when(output.state) {
+    private fun CommandStateIcon(state: CommandState) {
+        when(state) {
             CommandState.RUNNING ->
                 Icon(
                     Icons.Default.Refresh, contentDescription = "",
                     modifier = Modifier.size(25.dp))
             CommandState.SUCCESS ->
                 Icon(
-                    Icons.Filled.CheckCircle, contentDescription = "",
+                    Icons.Default.CheckCircle, contentDescription = "",
                     modifier = Modifier.size(25.dp), tint = Color.Green)
             CommandState.FAILED ->
                 Icon(
-                    Icons.Filled.Warning, contentDescription = "",
+                    Icons.Default.Warning, contentDescription = "",
                     modifier = Modifier.size(25.dp), tint = Color.Red)
         }
     }
 
     @Composable
-    fun Draw(shellStateVersion: Int) {
-        val commandOutput =  mutableStateOf(output.output)
-        val commandError = mutableStateOf(output.error)
+    private fun OutputDisplay(tick: Int) {
+        synchronized(this) {
+            Column {
+                for (child in document) {
+                    when(child) {
+                        is PlainText -> Text(child.literal.sanitize(), color = Color.DarkGray)
+                        is ErrorText -> Text(child.literal.sanitize(), color = Color.Red)
+                    }
+                }
+                Text(tick.toString(), modifier = Modifier.padding(0.dp, 10.dp))
+            }
+        }
+    }
 
-        refreshCommandOutput = {
-            commandOutput.value = output.output
-            commandError.value = output.error
+    @Composable
+    fun Draw(shellStateVersion: Int) {
+        val currentTick = mutableStateOf(1)
+        if (ticker == null) {
+            ticker = Ticker {
+                currentTick.value = it
+            }
+            ticker!!.poll()
         }
 
         Card(
@@ -66,12 +97,11 @@ class CommandOutputCard(val command: String,
                         PromptIcon()
                         Text(command, color = Color.DarkGray)
                     }
-                    CommandStateIcon()
+                    CommandStateIcon(state.value)
                     Text(shellStateVersion.toString())
                 }
 
-                Text(commandOutput.value.sanitize(), color = Color.DarkGray)
-                Text(commandError.value.sanitize(), color = Color.Red)
+                OutputDisplay(currentTick.value)
             }
         }
     }

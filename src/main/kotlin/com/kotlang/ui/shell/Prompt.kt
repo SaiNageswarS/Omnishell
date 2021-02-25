@@ -14,7 +14,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import com.kotlang.CommandOutput
 import com.kotlang.plugins.CommandPlugin
 import com.kotlang.ui.PromptIcon
 
@@ -24,8 +23,8 @@ const val ENTER_KEY = 10
 
 class Prompt(private val shell: Shell) {
     private fun runCommand(command: String) {
-        val cmdRes = CommandOutputCard(command, CommandOutput())
-        shell.addCommandOutput(cmdRes)
+        val cmdRes = CommandExecutionCard(command)
+        shell.addCommandExecution(cmdRes)
 
         val plugin = CommandPlugin.getPlugin(command)
         Thread {

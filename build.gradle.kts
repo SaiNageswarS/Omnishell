@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.4.30"
-    id("org.jetbrains.compose") version "0.3.0"
+    id("org.jetbrains.compose") version "0.3.0-build154"
 }
 
 group = "me.user"
@@ -22,6 +22,7 @@ dependencies {
     implementation("commons-io:commons-io:2.8.0")
     implementation("com.jcraft:jsch:0.1.55")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.+")
+    implementation(kotlin("stdlib-jdk8"))
 }
 
 tasks.withType<KotlinCompile>() {
@@ -32,10 +33,15 @@ compose.desktop {
     application {
         javaHome = System.getenv("JDK_15")
 
-        mainClass = "MainKt"
+        mainClass = "com.kotlang.MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "OmniShell"
         }
     }
 }
+//val compileKotlin: KotlinCompile by tasks
+//compileKotlin.kotlinOptions.useIR = true
+//compileKotlin.kotlinOptions {
+//    jvmTarget = "15"
+//}
