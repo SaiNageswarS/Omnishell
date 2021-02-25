@@ -10,7 +10,7 @@ class SshCommand: CommandPlugin("ssh\\s.*") {
     val jsch = JSch()
 
     override fun execute(workingDir: Path, commandAndArgsStmt: String,
-                         shellActions: Shell, commandExecutionCard: CommandExecutionCard) {
+                         shellActions: Shell, executionCard: CommandExecutionCard) {
 //        val userHost = commandAndArgsStmt[1].split("@")
 //        val host = userHost[1]
 //        val user = userHost[0].split(":")[0]

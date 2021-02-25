@@ -5,8 +5,10 @@ import com.kotlang.CommandState
 /**
  * Used to produce ticks for UI events.
  */
-class Ticker(private val notify: (Int) -> Unit) {
-    private var currentTick = 1
+class Ticker() {
+    lateinit var notify: (Int) -> Unit
+
+    private var currentTick = 0
         set(value) {
             field = value
             notify(field)

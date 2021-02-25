@@ -27,18 +27,22 @@ class FileTree() {
         val extension = if (Files.isDirectory(fileDetail)) "folder"
         else FilenameUtils.getExtension(fileDetail.toString())
 
-        val iconPath = when(extension) {
-            "folder" -> "images/folder_black_18dp.xml"
-            "jpg", "svg", "png" -> "images/image_black_18dp.xml"
-            "mp3", "wav" -> "music_note_black_18dp.xml"
-            "pdf" -> "picture_as_pdf_black_18dp.xml"
-            else -> "images/text_snippet_black_18dp.xml"
+        val iconDisplay = when(extension) {
+            "folder" -> Pair("images/folder_black_18dp.xml",
+                          MaterialTheme.colors.secondaryVariant)
+            "jpg", "svg", "png" -> Pair("images/image_black_18dp.xml",
+                          Color.White)
+            "mp3", "wav" -> Pair("images/music_note_black_18dp.xml",
+                          Color.White)
+            "pdf" -> Pair("images/picture_as_pdf_black_18dp.xml",
+                          Color.White)
+            else -> Pair("images/text_snippet_black_18dp.xml", Color.White)
         }
 
-        Icon(imageVector = vectorXmlResource(iconPath),
+        Icon(imageVector = vectorXmlResource(iconDisplay.first),
             contentDescription = "",
             modifier = Modifier.width(18.dp),
-            tint = MaterialTheme.colors.secondaryVariant
+            tint = iconDisplay.second
         )
     }
 

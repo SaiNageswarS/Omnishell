@@ -8,9 +8,9 @@ import java.nio.file.Path
 
 class ClearCommand: CommandPlugin("clear") {
     override fun execute(workingDir: Path, commandAndArgsStmt: String,
-                         shellActions: Shell, commandExecutionCard: CommandExecutionCard) {
+                         shellActions: Shell, executionCard: CommandExecutionCard) {
         shellActions.clearHistory()
-        commandExecutionCard.refreshState(CommandState.SUCCESS)
+        executionCard.refreshState(CommandState.SUCCESS)
     }
 
 }

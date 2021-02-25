@@ -13,7 +13,7 @@ import java.nio.file.Paths
 
 class ChangeDirectory: CommandPlugin("cd\\s.*") {
     override fun execute(workingDir: Path, commandAndArgsStmt: String,
-                         shellActions: Shell, commandExecutionCard: CommandExecutionCard) {
+                         shellActions: Shell, executionCard: CommandExecutionCard) {
         val commandAndArguments = commandAndArgsStmt.split("\\s(?=(?:[^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*\$)".toRegex())
 
         if (commandAndArguments.size > 1) {
@@ -27,14 +27,14 @@ class ChangeDirectory: CommandPlugin("cd\\s.*") {
                     .normalize().toAbsolutePath()
 
             if (Files.notExists(newPath) || !Files.isDirectory(newPath)) {
-                commandExecutionCard.appendOutput(
+                executionCard.document.appendWord(
                     ErrorText("Path does not exist."))
-                commandExecutionCard.refreshState(CommandState.FAILED)
+                executionCard.refreshState(CommandState.FAILED)
                 return
             }
             changePathUiCb(newPath)
         }
 
-        commandExecutionCard.refreshState(CommandState.SUCCESS)
+        executionCard.refreshState(CommandState.SUCCESS)
     }
 }

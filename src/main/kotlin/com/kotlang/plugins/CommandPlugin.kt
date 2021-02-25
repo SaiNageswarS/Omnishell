@@ -12,7 +12,7 @@ abstract class CommandPlugin(command: String) {
     private val commandRegex = command.toRegex()
 
     abstract fun execute(workingDir: Path, commandAndArgsStmt: String,
-                         shellActions: Shell, commandExecutionCard: CommandExecutionCard)
+                         shellActions: Shell, executionCard: CommandExecutionCard)
 
     fun match(inputCmd: String): Boolean {
         //not working in mac

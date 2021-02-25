@@ -11,36 +11,38 @@ import java.nio.file.Path
 
 class DefaultCommand: CommandPlugin(".*") {
     override fun execute(workingDir: Path, commandAndArgsStmt: String,
-                         shellActions: Shell, commandExecutionCard: CommandExecutionCard) {
+                         shellActions: Shell, executionCard: CommandExecutionCard) {
         val finalState = try {
             val procBuilder = ProcessBuilder("/bin/sh", "-c", commandAndArgsStmt)
                 .directory(workingDir.toFile())
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectError(ProcessBuilder.Redirect.PIPE)
+                .redirectInput(ProcessBuilder.Redirect.PIPE)
 
             val environment = procBuilder.environment()
             environment.putAll(Environment.getEnvironment())
             println(environment)
 
-            val proc = procBuilder.start()
+            executionCard.process = procBuilder.start()
 
             val streamTasks = listOf(
-                gobbleStream(proc.inputStream, commandExecutionCard.appendOutput, false),
-                gobbleStream(proc.errorStream, commandExecutionCard.appendOutput, true))
+                gobbleStream(executionCard.process!!.inputStream, executionCard.document, false),
+                gobbleStream(executionCard.process!!.errorStream, executionCard.document, true)
+            )
 
-            proc.waitFor()
+            executionCard.process!!.waitFor()
             streamTasks.forEach { it.join() }
 
-            when(proc.exitValue()) {
+            when(executionCard.process!!.exitValue()) {
                 0 -> CommandState.SUCCESS
                 else -> CommandState.FAILED
             }
         } catch (e: Exception) {
-            commandExecutionCard.appendOutput(ErrorText(e.message ?: "Failed"))
+            executionCard.document.appendWord(ErrorText(e.message ?: "Failed"))
             e.printStackTrace()
             CommandState.FAILED
         }
 
-        commandExecutionCard.refreshState(finalState)
+        executionCard.refreshState(finalState)
     }
 }
