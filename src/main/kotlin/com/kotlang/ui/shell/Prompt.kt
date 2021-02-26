@@ -1,25 +1,27 @@
 package com.kotlang.ui.shell
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.*
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import com.kotlang.plugins.AutoCompletePlugin
 import com.kotlang.plugins.CommandPlugin
 import com.kotlang.ui.PromptIcon
 
 const val UP_ARROW_KEY = 38
 const val DOWN_ARROW_KEY = 40
 const val ENTER_KEY = 10
+const val F2_KEY = 113
 
 class Prompt(private val shell: Shell) {
     private fun runCommand(command: String) {
@@ -48,9 +50,18 @@ class Prompt(private val shell: Shell) {
                 value = command.value,
                 textStyle = TextStyle(color = Color.DarkGray),
                 onValueChange = { newVal: String -> command.value = newVal },
+                placeholder = { Text("Run Command here. Press Ctrl+S for Auto-Complete") },
+                leadingIcon = { PromptIcon() },
                 modifier = Modifier
-                    .background(color = Color.White)
                     .fillMaxWidth()
+                    .shortcuts {
+                        on(Key.CtrlLeft + Key.S) {
+                            val completion = AutoCompletePlugin.autoComplete(
+                                shell.currentWorkingDir, command.value, 0
+                            )
+                            command.value = completion
+                        }
+                    }
                     .onKeyEvent {
                         when (it.nativeKeyEvent.keyCode) {
                             UP_ARROW_KEY -> {
@@ -75,10 +86,13 @@ class Prompt(private val shell: Shell) {
                                     true
                                 } else false
                             }
+//                            F2_KEY -> {
+//
+//                                true
+//                            }
                             else -> false
                         }
                     },
-                leadingIcon = { PromptIcon() }
             )
         }
     }

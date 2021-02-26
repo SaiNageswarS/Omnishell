@@ -1,7 +1,5 @@
 package com.kotlang.util
 
-import com.kotlang.CommandState
-
 /**
  * Used to produce ticks for UI events.
  */

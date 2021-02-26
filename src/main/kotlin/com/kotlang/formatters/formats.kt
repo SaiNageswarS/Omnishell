@@ -4,7 +4,11 @@ import java.util.*
 
 open class Node()
 
-open class TextNode(var literal: String): Node()
+open class TextNode(var literal: String): Node() {
+    init {
+        literal = literal.replace("\t", "    ")
+    }
+}
 class ErrorText(literal: String): TextNode(literal)
 class PlainText(literal: String): TextNode(literal)
 

@@ -8,8 +8,8 @@ import com.kotlang.ui.shell.CommandExecutionCard
 import com.kotlang.ui.shell.Shell
 import java.nio.file.Path
 
-abstract class CommandPlugin(command: String) {
-    private val commandRegex = command.toRegex()
+abstract class CommandPlugin(commandPrefix: String) {
+    private val commandRegex = commandPrefix.toRegex()
 
     abstract fun execute(workingDir: Path, commandAndArgsStmt: String,
                          shellActions: Shell, executionCard: CommandExecutionCard)

@@ -23,6 +23,14 @@ dependencies {
     implementation("com.jcraft:jsch:0.1.55")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.+")
     implementation(kotlin("stdlib-jdk8"))
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.3.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.3.1")
+    testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }
 
 tasks.withType<KotlinCompile>() {

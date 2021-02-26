@@ -1,6 +1,5 @@
 package com.kotlang.ui.shell
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -93,8 +92,8 @@ class CommandExecutionCard(val command: String) {
                             }
                         }
                         .onKeyEvent { keyEvent ->
-                            when (keyEvent.nativeKeyEvent.keyCode) {
-                                ENTER_KEY -> {
+                            when (keyEvent.key) {
+                                Key.Enter -> {
                                     val input = processInput.value+"\n\r"
                                     //don't close the writer
                                     process!!.outputStream?.
