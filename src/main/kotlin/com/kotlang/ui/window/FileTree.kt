@@ -7,6 +7,8 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.vectorXmlResource
 import java.nio.file.Files
@@ -24,22 +26,26 @@ import org.apache.commons.io.FilenameUtils
 class FileTree() {
     @Composable
     private fun FileIcon(fileDetail: Path) {
-        val extension = if (Files.isDirectory(fileDetail)) "folder"
-        else FilenameUtils.getExtension(fileDetail.toString())
-
-        val iconDisplay = when(extension) {
-            "folder" -> Pair("images/folder_black_18dp.xml",
-                          MaterialTheme.colors.secondaryVariant)
-            "jpg", "svg", "png" -> Pair("images/image_black_18dp.xml",
-                          Color.White)
-            "mp3", "wav" -> Pair("images/music_note_black_18dp.xml",
-                          Color.White)
-            "pdf" -> Pair("images/picture_as_pdf_black_18dp.xml",
-                          Color.White)
-            else -> Pair("images/text_snippet_black_18dp.xml", Color.White)
+        val fileType = when {
+            Files.isDirectory(fileDetail) -> "folder"
+            Files.isExecutable(fileDetail) -> "exe"
+            else -> FilenameUtils.getExtension(fileDetail.toString())
         }
 
-        Icon(imageVector = vectorXmlResource(iconDisplay.first),
+        val iconDisplay = when(fileType) {
+            "folder" -> Pair(vectorXmlResource("images/folder_black_18dp.xml"),
+                          MaterialTheme.colors.secondaryVariant)
+            "jpg", "svg", "png" -> Pair(vectorXmlResource("images/image_black_18dp.xml"),
+                          Color.White)
+            "mp3", "wav" -> Pair(vectorXmlResource("images/music_note_black_18dp.xml"),
+                          Color.White)
+            "pdf" -> Pair(vectorXmlResource("images/picture_as_pdf_black_18dp.xml"),
+                          Color.White)
+            "exe" -> Pair(Icons.Default.PlayArrow, Color.Green)
+            else -> Pair(vectorXmlResource("images/text_snippet_black_18dp.xml"), Color.White)
+        }
+
+        Icon(imageVector = iconDisplay.first,
             contentDescription = "",
             modifier = Modifier.width(18.dp),
             tint = iconDisplay.second

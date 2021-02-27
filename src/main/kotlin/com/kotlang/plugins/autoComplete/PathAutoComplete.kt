@@ -40,7 +40,7 @@ class PathAutoComplete: AutoCompletePlugin() {
     //assumes last argument as path and auto-completes last argument
     override fun getAutoComplete(workingDir: Path, command: String): List<String> {
         val commandAndArguments = command.getCommandAndArguments()
-        val lastArgument = commandAndArguments[commandAndArguments.size-1]
+        val lastArgument = commandAndArguments.last()
         val completeFileNames = getFileNameAutoCompletion(workingDir, lastArgument)
         if (completeFileNames.isNotEmpty()) {
             val restOfTheCommand = commandAndArguments.subList(0, commandAndArguments.size-1)
@@ -52,8 +52,7 @@ class PathAutoComplete: AutoCompletePlugin() {
     }
 
     override fun isApplicable(command: String): Boolean {
-        //default auto-complete is path auto-complete.
-        //should be placed at the end of plugins.
-        return true
+        return command.split(" ").size >= 2 ||
+                command.startsWith("./")
     }
 }

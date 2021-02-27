@@ -24,6 +24,7 @@ import com.kotlang.formatters.PlainText
 import com.kotlang.ui.PromptIcon
 import com.kotlang.util.Ticker
 import com.kotlang.util.sanitize
+import java.awt.event.KeyEvent
 
 class CommandExecutionCard(val command: String) {
     private val state = mutableStateOf(CommandState.RUNNING)
@@ -67,7 +68,7 @@ class CommandExecutionCard(val command: String) {
         TextField(
             value = processInput.value,
             onValueChange = { newVal: String -> processInput.value = newVal },
-            placeholder = { Text("Enter Value or CtrlLeft+C to kill process.") },
+            placeholder = { Text("Enter Value or CtrlLeft+W to kill process.") },
             singleLine = true,
             colors = TextFieldDefaults.textFieldColors(
                 backgroundColor = Color.White,
@@ -76,15 +77,19 @@ class CommandExecutionCard(val command: String) {
                 unfocusedIndicatorColor = Color.White
             ),
             modifier = Modifier
+                .padding(0.dp)
                 .shortcuts {
-                    on(Key.CtrlLeft + Key.C) {
+                    on(Key.CtrlLeft + Key.W) {
                         document.appendWord(ErrorText("^C (Interrupted)"))
                         process!!.destroy()
                     }
                 }
-                .onKeyEvent { keyEvent ->
+                .onPreviewKeyEvent { keyEvent ->
                     when (keyEvent.key) {
                         Key.Enter -> {
+                            if (keyEvent.nativeKeyEvent.id == KeyEvent.KEY_RELEASED)
+                                return@onPreviewKeyEvent true
+
                             val input = processInput.value+"\n\r"
                             //don't close the writer
                             process!!.outputStream?.

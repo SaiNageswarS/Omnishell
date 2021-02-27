@@ -19,11 +19,16 @@ import androidx.compose.ui.unit.dp
 import com.kotlang.plugins.AutoCompletePlugin
 import com.kotlang.plugins.CommandPlugin
 import com.kotlang.ui.PromptIcon
+import java.awt.event.KeyEvent
 
 const val UP_ARROW_KEY = 38
 const val DOWN_ARROW_KEY = 40
 
 class Prompt(private val shell: Shell) {
+    private var autoCompleteInvocations = 0
+    private var oldSearchString = ""
+    private var searchResult = listOf<String>()
+
     private fun runCommand(command: String) {
         val cmdRes = CommandExecutionCard(command)
         shell.addCommandExecution(cmdRes)
@@ -57,20 +62,37 @@ class Prompt(private val shell: Shell) {
                     .onPreviewKeyEvent {
                         when(it.key) {
                             Key.Tab -> {
-                                if (command.value.text.trim().isNotEmpty()) {
-                                    val completion = AutoCompletePlugin.autoComplete(
-                                        shell.currentWorkingDir, command.value.text)
+                                if (it.nativeKeyEvent.id == KeyEvent.KEY_RELEASED)
+                                    return@onPreviewKeyEvent true
 
-                                    command.value = TextFieldValue(completion[0],
-                                        selection = TextRange(completion[0].length))
+                                if (command.value.text.trim().isEmpty())
+                                    return@onPreviewKeyEvent true
+
+                                if (command.value.text.trim() != oldSearchString) {
+                                    searchResult = AutoCompletePlugin.autoComplete(
+                                        shell.currentWorkingDir, command.value.text)
+                                    autoCompleteInvocations = -1
+                                }
+
+                                if (searchResult.isNotEmpty()) {
+                                    autoCompleteInvocations += 1
+                                    val idx = autoCompleteInvocations % searchResult.size
+                                    command.value = TextFieldValue(searchResult[idx],
+                                        selection = TextRange(searchResult[idx].length))
+                                    oldSearchString = command.value.text
                                 }
                                 true
                             }
                             Key.Enter -> {
+                                if (it.nativeKeyEvent.id == KeyEvent.KEY_RELEASED)
+                                    return@onPreviewKeyEvent true
+
                                 val cmdText = command.value.text
                                 if (!cmdText.endsWith("\\") && cmdText.trim().isNotEmpty()) {
                                     runCommand(cmdText)
                                     command.value = TextFieldValue("")
+                                    oldSearchString = ""
+                                    searchResult = listOf()
                                     historyIndex.value = -1
                                     true
                                 } else false
@@ -81,6 +103,9 @@ class Prompt(private val shell: Shell) {
                     .onKeyEvent {
                         when (it.nativeKeyEvent.keyCode) {
                             UP_ARROW_KEY -> {
+                                if (it.nativeKeyEvent.id == KeyEvent.KEY_RELEASED)
+                                    return@onKeyEvent true
+
                                 historyIndex.value += 1
                                 shell.getCommandAtIndex(historyIndex.value)?.let { lastCommand ->
                                     command.value = TextFieldValue(lastCommand)
@@ -88,6 +113,9 @@ class Prompt(private val shell: Shell) {
                                 true
                             }
                             DOWN_ARROW_KEY -> {
+                                if (it.nativeKeyEvent.id == KeyEvent.KEY_RELEASED)
+                                    return@onKeyEvent true
+
                                 historyIndex.value -= 1
                                 shell.getCommandAtIndex(historyIndex.value)?.let { lastCommand ->
                                     command.value = TextFieldValue(lastCommand)
