@@ -12,7 +12,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
-class ChangeDirectory: CommandPlugin("cd\\s.*") {
+class ChangeDirectory: CommandPlugin() {
     override fun execute(workingDir: Path, commandAndArgsStmt: String,
                          shellActions: Shell, executionCard: CommandExecutionCard) {
         val commandAndArguments = commandAndArgsStmt.getCommandAndArguments()
@@ -32,4 +32,6 @@ class ChangeDirectory: CommandPlugin("cd\\s.*") {
 
         executionCard.refreshState(CommandState.SUCCESS)
     }
+
+    override fun isApplicable(command: String): Boolean = command.startsWith("cd")
 }

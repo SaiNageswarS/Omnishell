@@ -6,6 +6,7 @@ import java.io.File
 import java.nio.file.Path
 
 class PathUtilTests {
+    //project workspace
     private val workingDir = Path.of(File("").absolutePath)
 
     @Test
@@ -26,5 +27,13 @@ class PathUtilTests {
         println("Sample rel path $sampleRelPath")
         println("Dest abs path $destPath")
         Assertions.assertEquals("$workingDir/src", "$destPath")
+    }
+
+    @Test
+    fun normalizeToHomeDirectory() {
+        val homePath = Path.of("~")
+        val destPath = homePath.normalize(workingDir)
+
+        Assertions.assertEquals(System.getProperty("user.home"), "$destPath")
     }
 }

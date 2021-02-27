@@ -1,42 +1,28 @@
 package com.kotlang.plugins
 
-import com.kotlang.plugins.command.ChangeDirectory
-import com.kotlang.plugins.command.ClearCommand
-import com.kotlang.plugins.command.DefaultCommand
-import com.kotlang.plugins.command.SshCommand
+import com.kotlang.plugins.command.*
 import com.kotlang.ui.shell.CommandExecutionCard
 import com.kotlang.ui.shell.Shell
 import java.nio.file.Path
 
-abstract class CommandPlugin(commandPrefix: String) {
-    private val commandRegex = commandPrefix.toRegex()
-
+abstract class CommandPlugin {
     abstract fun execute(workingDir: Path, commandAndArgsStmt: String,
                          shellActions: Shell, executionCard: CommandExecutionCard)
 
-    fun match(inputCmd: String): Boolean {
-        //not working in mac
-        return commandRegex.matches(inputCmd)
-    }
+    abstract fun isApplicable(command: String): Boolean
 
     companion object {
-        val commandPlugins = listOf(ChangeDirectory(), ClearCommand(),
+        private val commandPlugins = listOf(ChangeDirectory(), ClearCommand(),
+            SshCommand(), EditorCommand(),
             DefaultCommand())
 
         fun getPlugin(inputCmd: String): CommandPlugin {
-            // not working in mac
-//            for (plugin in commandPlugins) {
-//                if (plugin.match(inputCmd)) {
-//                    return plugin
-//                }
-//            }
-
-            return when {
-                inputCmd.startsWith("cd") -> ChangeDirectory()
-                inputCmd.startsWith("clear") -> ClearCommand()
-                inputCmd.startsWith("ssh") -> SshCommand()
-                else -> DefaultCommand()
+            for (plugin in commandPlugins) {
+                if (plugin.isApplicable(inputCmd)) {
+                    return plugin
+                }
             }
+            return DefaultCommand()
         }
     }
 }

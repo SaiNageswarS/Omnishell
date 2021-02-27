@@ -9,7 +9,7 @@ import com.kotlang.ui.shell.Shell
 import com.kotlang.util.gobbleStream
 import java.nio.file.Path
 
-class DefaultCommand: CommandPlugin(".*") {
+class DefaultCommand: CommandPlugin() {
     override fun execute(workingDir: Path, commandAndArgsStmt: String,
                          shellActions: Shell, executionCard: CommandExecutionCard) {
         val finalState = try {
@@ -45,4 +45,7 @@ class DefaultCommand: CommandPlugin(".*") {
 
         executionCard.refreshState(finalState)
     }
+
+    //default command executioner. Should be placed at the end of the plugins.
+    override fun isApplicable(command: String): Boolean = true
 }

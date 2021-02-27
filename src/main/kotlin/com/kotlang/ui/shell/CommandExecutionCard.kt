@@ -61,56 +61,63 @@ class CommandExecutionCard(val command: String) {
     }
 
     @Composable
-    private fun OutputDisplay(tick: Int) {
+    private fun RunningProcessInput() {
         val processInput = remember { mutableStateOf("") }
 
-        Column {
-            for (child in document.lines) {
-                when(child) {
-                    is PlainText -> Text(child.literal.sanitize(), color = Color.DarkGray)
-                    is ErrorText -> Text(child.literal.sanitize(), color = Color.Red)
-                }
-            }
-
-            if (process != null && state.value == CommandState.RUNNING) {
-                TextField(
-                    value = processInput.value,
-                    onValueChange = { newVal: String -> processInput.value = newVal },
-                    placeholder = { Text("Enter Value or CtrlLeft+C to kill process.") },
-                    singleLine = true,
-                    colors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = Color.White,
-                        disabledIndicatorColor = Color.White,
-                        focusedIndicatorColor = Color.White,
-                        unfocusedIndicatorColor = Color.White
-                    ),
-                    modifier = Modifier
-                        .shortcuts {
-                            on(Key.CtrlLeft + Key.C) {
-                                document.appendWord(ErrorText("^C (Interrupted)"))
-                                process!!.destroy()
-                            }
-                        }
-                        .onKeyEvent { keyEvent ->
-                            when (keyEvent.key) {
-                                Key.Enter -> {
-                                    val input = processInput.value+"\n\r"
-                                    //don't close the writer
-                                    process!!.outputStream?.
-                                        write(input.toByteArray())
-                                    process!!.outputStream?.flush()
-                                    document.appendWord(PlainText(input))
-                                    processInput.value = ""
-                                    true
-                                }
-                                else -> false
-                            }
+        TextField(
+            value = processInput.value,
+            onValueChange = { newVal: String -> processInput.value = newVal },
+            placeholder = { Text("Enter Value or CtrlLeft+C to kill process.") },
+            singleLine = true,
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = Color.White,
+                disabledIndicatorColor = Color.White,
+                focusedIndicatorColor = Color.White,
+                unfocusedIndicatorColor = Color.White
+            ),
+            modifier = Modifier
+                .shortcuts {
+                    on(Key.CtrlLeft + Key.C) {
+                        document.appendWord(ErrorText("^C (Interrupted)"))
+                        process!!.destroy()
                     }
-                )
-            }
-            if (tick > 0) {
-                Text(tick.toString(), modifier = Modifier.padding(0.dp, 10.dp),
-                    color = Color.Gray)
+                }
+                .onKeyEvent { keyEvent ->
+                    when (keyEvent.key) {
+                        Key.Enter -> {
+                            val input = processInput.value+"\n\r"
+                            //don't close the writer
+                            process!!.outputStream?.
+                            write(input.toByteArray())
+                            process!!.outputStream?.flush()
+                            document.appendWord(PlainText(input))
+                            processInput.value = ""
+                            true
+                        }
+                        else -> false
+                    }
+                }
+        )
+    }
+
+    @Composable
+    private fun OutputDisplay(tick: Int) {
+        synchronized(this) {
+            Column {
+                for (child in document.lines) {
+                    when(child) {
+                        is PlainText -> Text(child.literal.sanitize(), color = Color.DarkGray)
+                        is ErrorText -> Text(child.literal.sanitize(), color = Color.Red)
+                    }
+                }
+
+                if (process != null && state.value == CommandState.RUNNING) {
+                    RunningProcessInput()
+                }
+                if (tick > 0) {
+                    Text(tick.toString(), modifier = Modifier.padding(0.dp, 10.dp),
+                        color = Color.Gray)
+                }
             }
         }
     }

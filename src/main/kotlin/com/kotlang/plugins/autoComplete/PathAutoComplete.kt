@@ -9,41 +9,51 @@ import java.nio.file.Paths
 import java.util.stream.Collectors
 
 class PathAutoComplete: AutoCompletePlugin() {
-    fun getPrefixPath(path: String): String {
+    internal fun getPrefixPath(path: String): String {
         val folders = path.split("/")
         return folders.subList(0, folders.size - 1).joinToString(separator = "/")
     }
 
-    fun getSearchObject(path: String): String {
+    internal fun getSearchObject(path: String): String {
         val folders = path.split("/")
         return folders[folders.size-1]
     }
 
-    override fun getAutoComplete(workingDir: Path, command: String,
-        invocationCount: Int): String {
-        val commandAndArguments = command.getCommandAndArguments()
+    internal fun getFileNameAutoCompletion(workingDir: Path, lastArgument: String): List<String> {
+        val prefixPath = Paths.get(getPrefixPath(lastArgument))
+        val searchPath = prefixPath.normalize(workingDir)
+        val searchTerm = getSearchObject(lastArgument)
 
-        if (commandAndArguments.size > 1) {
-            val prefixPath = Paths.get(getPrefixPath(commandAndArguments[1]))
-            val searchPath = prefixPath.normalize(workingDir)
-            val searchTerm = getSearchObject(commandAndArguments[1])
-
-            val searchList = Files.list(searchPath)
-                .map { it.fileName.toString() }
-                .filter { it.startsWith(searchTerm, ignoreCase = true) }
-                .collect(Collectors.toList())
-
-            return commandAndArguments[0] + " " +
-                    (if("$prefixPath".length > 0) "$prefixPath/" else "") +
-                    searchList[invocationCount % searchList.size]
+        if (Files.notExists(searchPath)) {
+            return listOf()
         }
 
-        return command
+        val searchList = Files.list(searchPath)
+            .map { it.fileName.toString() }
+            .filter { it.startsWith(searchTerm, ignoreCase = true) }
+            .collect(Collectors.toList())
+
+        val prefixPathString = if("$prefixPath".length > 0) "$prefixPath/" else ""
+        return searchList.map { prefixPathString + it }
+    }
+
+    //assumes last argument as path and auto-completes last argument
+    override fun getAutoComplete(workingDir: Path, command: String): List<String> {
+        val commandAndArguments = command.getCommandAndArguments()
+        val lastArgument = commandAndArguments[commandAndArguments.size-1]
+        val completeFileNames = getFileNameAutoCompletion(workingDir, lastArgument)
+        if (completeFileNames.isNotEmpty()) {
+            val restOfTheCommand = commandAndArguments.subList(0, commandAndArguments.size-1)
+                .joinToString(" ")
+            return completeFileNames.map { "$restOfTheCommand $it" }
+        }
+
+        return listOf(command)
     }
 
     override fun isApplicable(command: String): Boolean {
-        val commandAndArguments = command.getCommandAndArguments()
-        return listOf("cd", "ls", "cat", "cp", "mv", "rm")
-            .contains(commandAndArguments[0])
+        //default auto-complete is path auto-complete.
+        //should be placed at the end of plugins.
+        return true
     }
 }
