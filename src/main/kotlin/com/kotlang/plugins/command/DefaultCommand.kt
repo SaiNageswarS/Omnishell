@@ -21,7 +21,6 @@ class DefaultCommand: CommandPlugin() {
 
             val environment = procBuilder.environment()
             environment.putAll(Environment.getEnvironment())
-            println(environment)
 
             executionCard.process = procBuilder.start()
 

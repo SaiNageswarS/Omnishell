@@ -19,7 +19,6 @@ fun gobbleStream(source: InputStream, document: Document,
         while (sc.hasNext()) {
             val line = sc.next()
             document.appendWord(getNode(line, isError))
-            println(line)
         }
     }
     task.start()
