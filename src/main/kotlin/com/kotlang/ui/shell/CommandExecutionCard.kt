@@ -5,6 +5,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.Composable
@@ -15,6 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kotlang.CommandState
@@ -64,6 +67,7 @@ class CommandExecutionCard(val command: String) {
     @Composable
     private fun RunningProcessInput() {
         val processInput = remember { mutableStateOf("") }
+        val isTextMasked = remember { mutableStateOf(command.startsWith("sudo")) }
 
         TextField(
             value = processInput.value,
@@ -76,6 +80,16 @@ class CommandExecutionCard(val command: String) {
                 focusedIndicatorColor = Color.White,
                 unfocusedIndicatorColor = Color.White
             ),
+            visualTransformation = if (isTextMasked.value) PasswordVisualTransformation()
+                else VisualTransformation.None,
+            trailingIcon = {
+                           IconButton(onClick = {
+                               isTextMasked.value = !isTextMasked.value
+                           }) {
+                               Icon(Icons.Default.Lock, contentDescription = "",
+                                tint = if (isTextMasked.value) Color.Red else Color.LightGray)
+                           }
+            },
             modifier = Modifier
                 .padding(0.dp)
                 .shortcuts {
@@ -92,10 +106,13 @@ class CommandExecutionCard(val command: String) {
 
                             val input = processInput.value+"\n\r"
                             //don't close the writer
-                            process!!.outputStream?.
-                            write(input.toByteArray())
+                            process!!.outputStream?.write(input.toByteArray())
                             process!!.outputStream?.flush()
-                            document.appendWord(PlainText(input))
+
+                            val displayText = if (!isTextMasked.value) PlainText(input)
+                                else PlainText("\n\r")
+
+                            document.appendWord(displayText)
                             processInput.value = ""
                             true
                         }

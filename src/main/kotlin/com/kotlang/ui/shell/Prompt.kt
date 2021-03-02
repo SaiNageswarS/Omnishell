@@ -37,7 +37,8 @@ class Prompt(private val shell: Shell) {
         Thread {
             //wait for initialization of command card UI callbacks
             Thread.sleep(500)
-            plugin.execute(shell.currentWorkingDir, command, shell, cmdRes)
+            plugin.execute(shell.currentWorkingDir, command.replace("sudo", "sudo -S "),
+                shell, cmdRes)
         }.start()
     }
 
