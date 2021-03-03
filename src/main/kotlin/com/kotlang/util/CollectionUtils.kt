@@ -1,5 +1,7 @@
 package com.kotlang.util
 
+import java.util.LinkedList
+
 fun<T> List<T>.cloneAndAppend(item: T, limit: Int): List<T> {
     val newList = mutableListOf<T>()
     newList.addAll(this.takeLast(limit))
@@ -17,3 +19,5 @@ fun<T> MutableList<T>.cloneAndReplace(item: T, index: Int): MutableList<T> {
 fun String.sanitize(): String {
     return this.trim()
 }
+
+fun<T> List<T>.toLinkedList() = LinkedList(this)

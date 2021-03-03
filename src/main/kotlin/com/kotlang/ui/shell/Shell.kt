@@ -14,33 +14,25 @@ import com.kotlang.ui.EnvironmentDialog
 import com.kotlang.ui.window.refreshShell
 import java.net.InetAddress
 import java.nio.file.Path
+import java.util.*
 
-class Shell(var commandExecutionCards: MutableList<CommandExecutionCard> = mutableListOf(),
+class Shell(var commandExecutionCards: LinkedList<CommandExecutionCard> = LinkedList<CommandExecutionCard>(),
             var currentWorkingDir: Path = Path.of(System.getProperty("user.home")),
             var index: Int = 0) {
-
-    fun getCommandAtIndex(index: Int): String? {
-        if (index < 0 || index >= commandExecutionCards.size) {
-            return null
-        }
-
-        return commandExecutionCards[index].command
-    }
-
     fun addCommandExecution(commandExecution: CommandExecutionCard) {
-        commandExecutionCards.add(0, commandExecution)
+        commandExecutionCards.addFirst(commandExecution)
         refreshShell()
     }
 
     fun clearHistory() {
-        commandExecutionCards = mutableListOf()
+        commandExecutionCards = LinkedList<CommandExecutionCard>()
         refreshShell()
     }
 
     @Composable
     private fun EnvironmentInfoChips() {
         val hostName = InetAddress.getLocalHost().hostName
-        val userName = System.getProperty("user.name")
+//        val userName = System.getProperty("user.name")
 
         Row(
             horizontalArrangement = Arrangement.End,
