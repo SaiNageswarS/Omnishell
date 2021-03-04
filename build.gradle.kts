@@ -43,6 +43,7 @@ compose.desktop {
 
         mainClass = "com.kotlang.MainKt"
         nativeDistributions {
+            modules("java.net.http")
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "OmniShell"
         }

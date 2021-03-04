@@ -1,13 +1,12 @@
 package com.kotlang
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import java.nio.file.Files
 import java.nio.file.Path
 
 object Environment {
-    private val mapper = ObjectMapper().registerKotlinModule()
+    private val mapper = jacksonObjectMapper()
     private val envConfigFolder = Path.of(System.getProperty("user.home") + "/config")
     private val envConfigFile = Path.of(envConfigFolder.toString(), "OmnishellEnv.json")
 
