@@ -23,6 +23,7 @@ dependencies {
     implementation("com.jcraft:jsch:0.1.55")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.+")
     implementation(kotlin("stdlib-jdk8"))
+    implementation("com.konghq:unirest-java:3.11.09")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.3.1")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.3.1")
