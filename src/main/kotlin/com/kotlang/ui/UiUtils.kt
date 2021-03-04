@@ -47,6 +47,7 @@ fun PromptIcon() {
 
 @Composable
 fun SearchSuggestions(items: List<String>,
+                      selectedIdx: Int = -1,
                       modifier: Modifier,
                       onClick: (String) -> Unit) {
     if (items.isNotEmpty()) {
@@ -54,9 +55,16 @@ fun SearchSuggestions(items: List<String>,
             shape = RoundedCornerShape(8.dp),
             modifier = modifier) {
             Column {
-                items.forEach {
-                    DropdownMenuItem(onClick = { onClick(it) }) {
-                        Text(it)
+                items.forEachIndexed { idx, item ->
+                    val bckgndColor = if (idx == selectedIdx) Color.Blue
+                        else Color.Transparent
+                    val textColor = if (idx == selectedIdx) Color.White
+                        else Color.DarkGray
+
+                    DropdownMenuItem(onClick = { onClick(item) },
+                        modifier = Modifier.background(bckgndColor)
+                    ) {
+                        Text(item, color = textColor)
                     }
                 }
             }

@@ -12,15 +12,15 @@ val historyManager = HistoryManager(Path.of("~/.bash_history").normalize(
 ))
 
 class HistoryManager(private val bashHistoryFilePath: Path) {
-    private val history: LinkedList<String> = Files.readAllLines(bashHistoryFilePath)
-        .reversed().toLinkedList()
+    val history: LinkedList<String> = Files.readAllLines(bashHistoryFilePath)
+        .reversed().toLinkedList(true)
     private val historySet = history.toMutableSet()
 
     fun addToHistory(command: String) {
         if (!historySet.contains(command)) {
             history.addFirst(command)
             historySet.add(command)
-            Files.writeString(bashHistoryFilePath, command, StandardOpenOption.APPEND)
+            Files.writeString(bashHistoryFilePath, command+"\n", StandardOpenOption.APPEND)
         }
     }
 

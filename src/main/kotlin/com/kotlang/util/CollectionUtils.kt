@@ -20,4 +20,6 @@ fun String.sanitize(): String {
     return this.trim()
 }
 
-fun<T> List<T>.toLinkedList() = LinkedList(this)
+fun<T> List<T>.toLinkedList(removeDuplicates: Boolean = false) =
+    if (removeDuplicates) LinkedList(this.distinct())
+    else LinkedList(this)
