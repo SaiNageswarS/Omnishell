@@ -46,6 +46,20 @@ compose.desktop {
             modules("java.net.http")
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "OmniShell"
+
+            macOS {
+                // macOS DSL settings
+                bundleID = "com.kotlang.Omnishell"
+                signing {
+                    sign.set(true)
+                    identity.set("SaiNageswar Satchidanand")
+                    // keychain.set("/path/to/keychain")
+                }
+                notarization {
+                    appleID.set("sainageswar@alumni.iitm.ac.in")
+                    password.set("passwordPlaceholder")
+                }
+            }
         }
     }
 }
