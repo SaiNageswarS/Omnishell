@@ -59,6 +59,12 @@ compose.desktop {
                     appleID.set("sainageswar@alumni.iitm.ac.in")
                     password.set("passwordPlaceholder")
                 }
+
+                iconFile.set(project.file("src/main/resources/osIcon.icns"))
+            }
+
+            linux {
+                iconFile.set(project.file("src/main/resources/osIcon.png"))
             }
         }
     }
