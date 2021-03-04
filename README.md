@@ -16,6 +16,7 @@ Modern shell combining the flexibility of graphical interface with the power of 
 
 # Downloads
 MacOS: https://github.com/SaiNageswarS/Omnishell/releases/download/Mac-0.0.3/OmniShell.zip
+
 Linux: https://github.com/SaiNageswarS/Omnishell/releases/download/Linux-0.0.3/OmniShell.zip
 
 # Notes
