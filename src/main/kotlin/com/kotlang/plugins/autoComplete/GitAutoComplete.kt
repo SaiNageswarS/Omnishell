@@ -4,7 +4,7 @@ import com.kotlang.plugins.AutoCompletePlugin
 import com.kotlang.util.getCommandAndArguments
 import java.nio.file.Path
 
-class GitAutoComplete: AutoCompletePlugin() {
+class GitAutoComplete(maxSuggestions: Int): AutoCompletePlugin(maxSuggestions) {
     private val searchList = listOf("status", "clone", "init", "add", "mv", "restore", "rm",
         "sparse-checkout", "bisect", "diff", "grep", "log", "show",
         "branch", "commit", "merge", "rebase", "reset", "switch", "tag", "fetch",
@@ -18,13 +18,14 @@ class GitAutoComplete: AutoCompletePlugin() {
 
             val possibleCompletion = searchList
                 .filter { it.startsWith(searchTerm, ignoreCase = true) }
+                .take(maxSuggestions)
 
             return possibleCompletion.map {
                 commandAndArguments[0] + " " + it
             }
         }
 
-        return listOf(command)
+        return listOf()
     }
 
     override fun isApplicable(command: String): Boolean {

@@ -50,9 +50,7 @@ class CommandExecutionCard(val command: String) {
     private fun CommandStateIcon(state: CommandState) {
         when(state) {
             CommandState.RUNNING ->
-                Icon(
-                    Icons.Default.Refresh, contentDescription = "",
-                    modifier = Modifier.size(25.dp))
+                CircularProgressIndicator(modifier = Modifier.size(25.dp))
             CommandState.SUCCESS ->
                 Icon(
                     Icons.Default.CheckCircle, contentDescription = "",
@@ -72,7 +70,7 @@ class CommandExecutionCard(val command: String) {
         TextField(
             value = processInput.value,
             onValueChange = { newVal: String -> processInput.value = newVal },
-            placeholder = { Text("Enter Value or CtrlLeft+W to kill process.") },
+            placeholder = { Text("Enter Input to process or Ctrl+W to kill process.") },
             singleLine = true,
             colors = TextFieldDefaults.textFieldColors(
                 backgroundColor = Color.White,
@@ -94,8 +92,9 @@ class CommandExecutionCard(val command: String) {
                 .padding(0.dp)
                 .shortcuts {
                     on(Key.CtrlLeft + Key.W) {
-                        document.appendWord(ErrorText("^C (Interrupted)"))
+                        document.appendWord(ErrorText("^W (Interrupted)"))
                         process!!.destroy()
+                        refreshState(CommandState.FAILED)
                     }
                 }
                 .onPreviewKeyEvent { keyEvent ->

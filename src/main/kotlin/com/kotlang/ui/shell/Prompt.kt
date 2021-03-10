@@ -6,7 +6,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
@@ -25,7 +24,6 @@ import java.awt.event.KeyEvent
 //const val DOWN_ARROW_KEY = 40
 
 class Prompt(private val shell: Shell) {
-    private var autoCompleteInvocations = 0
     private var oldSearchString = ""
     private var searchResult = listOf<String>()
     private val command = mutableStateOf(TextFieldValue(""))
@@ -48,21 +46,10 @@ class Prompt(private val shell: Shell) {
     }
 
     private fun autoComplete(): Boolean {
-        if (command.value.text.trim().isEmpty())
-            return true
-
-        if (command.value.text.trim() != oldSearchString) {
-            searchResult = AutoCompletePlugin.autoComplete(
-                shell.currentWorkingDir, command.value.text)
-            autoCompleteInvocations = -1
-        }
-
-        if (searchResult.isNotEmpty()) {
-            autoCompleteInvocations += 1
-            val idx = autoCompleteInvocations % searchResult.size
-            command.value = TextFieldValue(searchResult[idx],
-                selection = TextRange(searchResult[idx].length))
-            oldSearchString = command.value.text
+        if (suggestionIdx.value == -1) {
+            val firstSuggestion = commandSuggestions.value[0]
+            command.value = TextFieldValue(firstSuggestion,
+                selection = TextRange(firstSuggestion.length))
         }
         return true
     }
@@ -107,7 +94,12 @@ class Prompt(private val shell: Shell) {
                 onValueChange = { newVal: TextFieldValue ->
                     command.value = newVal
                     suggestionIdx.value = -1
-                    commandSuggestions.value = historyManager.searchHistory(command.value.text)
+                    val autoCompleteSuggestions = AutoCompletePlugin.autoComplete(shell.currentWorkingDir,
+                        command.value.text)
+                    val historySuggestions = historyManager.searchHistory(command.value.text)
+
+                    val suggestions = autoCompleteSuggestions + historySuggestions
+                    commandSuggestions.value = suggestions.distinct()
                 },
                 placeholder = { Text("Run Command here. Press Tab for Auto-Complete") },
                 leadingIcon = { PromptIcon() },

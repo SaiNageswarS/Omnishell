@@ -8,7 +8,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.stream.Collectors
 
-class PathAutoComplete: AutoCompletePlugin() {
+class PathAutoComplete(maxSuggestions: Int): AutoCompletePlugin(maxSuggestions) {
     internal fun getPrefixPath(path: String): String {
         val folders = path.split("/")
         return folders.subList(0, folders.size - 1).joinToString(separator = "/")
@@ -31,6 +31,7 @@ class PathAutoComplete: AutoCompletePlugin() {
         val searchList = Files.list(searchPath)
             .map { it.fileName.toString() }
             .filter { it.startsWith(searchTerm, ignoreCase = true) }
+            .limit(maxSuggestions.toLong())
             .collect(Collectors.toList())
 
         val prefixPathString = if("$prefixPath".length > 0) "$prefixPath/" else ""
@@ -41,6 +42,11 @@ class PathAutoComplete: AutoCompletePlugin() {
     override fun getAutoComplete(workingDir: Path, command: String): List<String> {
         val commandAndArguments = command.getCommandAndArguments()
         val lastArgument = commandAndArguments.last()
+
+        if (lastArgument.isEmpty()) {
+            return listOf()
+        }
+
         val completeFileNames = getFileNameAutoCompletion(workingDir, lastArgument)
         if (completeFileNames.isNotEmpty()) {
             val restOfTheCommand = commandAndArguments.subList(0, commandAndArguments.size-1)
@@ -48,7 +54,7 @@ class PathAutoComplete: AutoCompletePlugin() {
             return completeFileNames.map { "$restOfTheCommand $it" }
         }
 
-        return listOf(command)
+        return listOf()
     }
 
     override fun isApplicable(command: String): Boolean {

@@ -6,7 +6,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.stream.Collectors
 
-class CommandAutoComplete: AutoCompletePlugin() {
+class CommandAutoComplete(maxSuggestions: Int): AutoCompletePlugin(maxSuggestions) {
     override fun getAutoComplete(workingDir: Path, command: String): List<String> {
         val cmdList = command.split(" ")
         val searchTerm = cmdList.last()
@@ -20,10 +20,15 @@ class CommandAutoComplete: AutoCompletePlugin() {
             val binaries =
                 Files.list(Path.of(binPath)).map { it.fileName.toString() }
                     .filter { it.startsWith(searchTerm, ignoreCase = true) }
+                    .limit(maxSuggestions.toLong())
                     .collect(Collectors.toList())
             searchList.addAll(binaries)
+
+            if (searchList.size >= maxSuggestions) {
+                break
+            }
         }
-        return searchList.map { prefix + it}
+        return searchList.map { prefix + it }
     }
 
     override fun isApplicable(command: String): Boolean {
