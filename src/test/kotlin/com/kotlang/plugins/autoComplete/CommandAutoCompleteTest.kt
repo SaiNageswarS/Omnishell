@@ -12,7 +12,7 @@ class CommandAutoCompleteTest {
     @Test
     fun testGetAutoComplete() {
         val testCommand = "gre"
-        val completions = CommandAutoComplete().getAutoComplete(workingDir, testCommand)
+        val completions = CommandAutoComplete(2).getAutoComplete(workingDir, testCommand)
         Assertions.assertTrue(completions.contains("grep"))
     }
 }

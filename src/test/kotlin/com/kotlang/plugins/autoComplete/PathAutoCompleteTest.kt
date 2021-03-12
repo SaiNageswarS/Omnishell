@@ -12,14 +12,14 @@ class PathAutoCompleteTest {
     @Test
     fun testGetPrefixPath() {
         val testPath = "/home/sainageswar/work"
-        val prefixPath = PathAutoComplete().getPrefixPath(testPath)
+        val prefixPath = PathAutoComplete(2).getPrefixPath(testPath)
         Assertions.assertEquals("/home/sainageswar", prefixPath)
     }
 
     @Test
     fun testGetSearchObject() {
         val testPath = "/home/sainageswar/work"
-        val searchObj = PathAutoComplete().getSearchObject(testPath)
+        val searchObj = PathAutoComplete(2).getSearchObject(testPath)
         Assertions.assertEquals(searchObj, "work")
     }
 
@@ -27,7 +27,7 @@ class PathAutoCompleteTest {
     fun testGetFileNameAutoCompletion() {
         //searching for resources folder
         val searchFile = "src/main/res"
-        val completions = PathAutoComplete().getFileNameAutoCompletion(
+        val completions = PathAutoComplete(2).getFileNameAutoCompletion(
             workingDir, searchFile
         )
         Assertions.assertEquals(completions[0], "src/main/resources")
@@ -37,7 +37,7 @@ class PathAutoCompleteTest {
     fun testGetFileNameAutoCompletionNonExistentDir() {
         //searching for resources folder
         val searchFile = "src/main/notExisting/res"
-        val completions = PathAutoComplete().getFileNameAutoCompletion(
+        val completions = PathAutoComplete(2).getFileNameAutoCompletion(
             workingDir, searchFile
         )
         //no auto-completion
