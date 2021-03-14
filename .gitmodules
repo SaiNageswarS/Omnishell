@@ -1,0 +1,3 @@
+[submodule "src/main/OmnishellProcessManagerModel"]
+	path = src/main/OmnishellProcessManagerModel
+	url = git@github.com:SaiNageswarS/OmnishellProcessManagerModel.git

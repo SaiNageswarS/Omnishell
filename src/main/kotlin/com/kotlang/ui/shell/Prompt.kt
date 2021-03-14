@@ -13,12 +13,15 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import com.kotlang.historyManager
-import com.kotlang.plugins.AutoCompletePlugin
+import com.kotlang.hostAgent
+import com.kotlang.omnishell.CommandContext
 import com.kotlang.plugins.CommandPlugin
 import com.kotlang.ui.PromptIcon
 import com.kotlang.ui.SearchSuggestions
 import java.awt.event.KeyEvent
+import kotlinx.coroutines.runBlocking
+import com.kotlang.omnishell.HistoryEntry
+import com.kotlang.omnishell.HistoryQuery
 
 //const val UP_ARROW_KEY = 38
 //const val DOWN_ARROW_KEY = 40
@@ -34,7 +37,11 @@ class Prompt(private val shell: Shell) {
     private fun runCommand(command: String) {
         val cmdRes = CommandExecutionCard(command)
         shell.addCommandExecution(cmdRes)
-        historyManager.addToHistory(command)
+        runBlocking {
+            hostAgent.historyManagerClient.addToHistory(
+                HistoryEntry.newBuilder().setCommand(command).build()
+            )
+        }
 
         val plugin = CommandPlugin.getPlugin(command)
         Thread {
@@ -67,12 +74,12 @@ class Prompt(private val shell: Shell) {
     }
 
     private fun selectSuggestion(increment: Int) {
-        if (commandSuggestions.value.isEmpty() &&
-            suggestionIdx.value + increment in historyManager.history.indices) {
-            val selectedCommand = historyManager.history[suggestionIdx.value + increment]
-            command.value = TextFieldValue(selectedCommand, selection = TextRange(selectedCommand.length))
-            suggestionIdx.value = suggestionIdx.value + increment
-        }
+//        if (commandSuggestions.value.isEmpty() &&
+//            suggestionIdx.value + increment in historyManager.history.indices) {
+//            val selectedCommand = historyManager.history[suggestionIdx.value + increment]
+//            command.value = TextFieldValue(selectedCommand, selection = TextRange(selectedCommand.length))
+//            suggestionIdx.value = suggestionIdx.value + increment
+//        }
 
         if (suggestionIdx.value + increment in commandSuggestions.value.indices) {
             val selectedCommand = commandSuggestions.value[suggestionIdx.value + increment]
@@ -94,9 +101,18 @@ class Prompt(private val shell: Shell) {
                 onValueChange = { newVal: TextFieldValue ->
                     command.value = newVal
                     suggestionIdx.value = -1
-                    val autoCompleteSuggestions = AutoCompletePlugin.autoComplete(shell.currentWorkingDir,
-                        command.value.text)
-                    val historySuggestions = historyManager.searchHistory(command.value.text)
+                    val autoCompleteSuggestions = runBlocking {
+                        hostAgent.autoCompleteClient.autoComplete(
+                            CommandContext.newBuilder().setCommand(command.value.text)
+                                .setMaxSuggestions(2).setWorkingDir(shell.currentWorkingDir.toString()).build()
+                        ).suggestionsList
+                    }
+                    val historySuggestions = runBlocking {
+                        hostAgent.historyManagerClient.searchHistory(
+                            HistoryQuery.newBuilder().setPrefix(command.value.text)
+                                .setLimit(5).build()
+                        )
+                    }.searchResultList
 
                     val suggestions = autoCompleteSuggestions + historySuggestions
                     commandSuggestions.value = suggestions.distinct()
