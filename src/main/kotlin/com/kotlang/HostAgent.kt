@@ -1,6 +1,7 @@
 package com.kotlang
 
 import com.kotlang.omnishell.AutoCompleteServiceGrpcKt
+import com.kotlang.omnishell.CommandExecutionServiceGrpcKt
 import com.kotlang.omnishell.FileSystemManagerGrpcKt
 import com.kotlang.omnishell.HistoryManagerGrpcKt
 import io.grpc.ManagedChannel
@@ -15,6 +16,7 @@ class HostAgent(host: String, port: Int) {
     val historyManagerClient: HistoryManagerGrpcKt.HistoryManagerCoroutineStub
     val autoCompleteClient: AutoCompleteServiceGrpcKt.AutoCompleteServiceCoroutineStub
     val fileSystemClient: FileSystemManagerGrpcKt.FileSystemManagerCoroutineStub
+    val commandExecutionClient: CommandExecutionServiceGrpcKt.CommandExecutionServiceCoroutineStub
 
     init {
         //copy host agent to home folder
@@ -25,5 +27,6 @@ class HostAgent(host: String, port: Int) {
         historyManagerClient = HistoryManagerGrpcKt.HistoryManagerCoroutineStub(channel)
         autoCompleteClient = AutoCompleteServiceGrpcKt.AutoCompleteServiceCoroutineStub(channel)
         fileSystemClient = FileSystemManagerGrpcKt.FileSystemManagerCoroutineStub(channel)
+        commandExecutionClient = CommandExecutionServiceGrpcKt.CommandExecutionServiceCoroutineStub(channel)
     }
 }

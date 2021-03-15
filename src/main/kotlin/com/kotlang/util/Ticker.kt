@@ -18,6 +18,7 @@ class Ticker() {
 
     //Will be called only once per instance
     fun poll() {
+        isRunning = true
         if (pollingThread == null) {
             pollingThread = Thread {
                 while (isRunning) {

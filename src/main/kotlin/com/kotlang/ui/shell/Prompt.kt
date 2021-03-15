@@ -6,6 +6,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
@@ -14,14 +15,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.kotlang.hostAgent
-import com.kotlang.omnishell.CommandContext
-import com.kotlang.plugins.CommandPlugin
+import com.kotlang.omnishell.*
+import com.kotlang.shellCommands.ShellCommand
 import com.kotlang.ui.PromptIcon
 import com.kotlang.ui.SearchSuggestions
 import java.awt.event.KeyEvent
-import kotlinx.coroutines.runBlocking
-import com.kotlang.omnishell.HistoryEntry
-import com.kotlang.omnishell.HistoryQuery
+import kotlinx.coroutines.*
 
 //const val UP_ARROW_KEY = 38
 //const val DOWN_ARROW_KEY = 40
@@ -35,25 +34,20 @@ class Prompt(private val shell: Shell) {
 
 
     private fun runCommand(command: String) {
-        val cmdRes = CommandExecutionCard(command)
+        val cmd = CommandInput.newBuilder().setCommandAndArguments(command.replace("sudo", "sudo -S "))
+            .setWorkingDir(shell.currentWorkingDir.toString()).build()
+        val cmdRes = ShellCommand.getExecutionCard(cmd, shell)
+
         shell.addCommandExecution(cmdRes)
         runBlocking {
             hostAgent.historyManagerClient.addToHistory(
                 HistoryEntry.newBuilder().setCommand(command).build()
             )
         }
-
-        val plugin = CommandPlugin.getPlugin(command)
-        Thread {
-            //wait for initialization of command card UI callbacks
-            Thread.sleep(500)
-            plugin.execute(shell.currentWorkingDir, command.replace("sudo", "sudo -S "),
-                shell, cmdRes)
-        }.start()
     }
 
     private fun autoComplete(): Boolean {
-        if (suggestionIdx.value == -1) {
+        if (suggestionIdx.value == -1 && commandSuggestions.value.isNotEmpty()) {
             val firstSuggestion = commandSuggestions.value[0]
             command.value = TextFieldValue(firstSuggestion,
                 selection = TextRange(firstSuggestion.length))
@@ -88,8 +82,11 @@ class Prompt(private val shell: Shell) {
         }
     }
 
+    @ExperimentalCoroutinesApi
     @Composable
     fun Draw() {
+        val scope = rememberCoroutineScope()
+
         Card(
             shape = RoundedCornerShape(8.dp),
             backgroundColor = Color.White,
@@ -100,22 +97,25 @@ class Prompt(private val shell: Shell) {
                 textStyle = TextStyle(color = Color.DarkGray),
                 onValueChange = { newVal: TextFieldValue ->
                     command.value = newVal
-                    suggestionIdx.value = -1
-                    val autoCompleteSuggestions = runBlocking {
-                        hostAgent.autoCompleteClient.autoComplete(
-                            CommandContext.newBuilder().setCommand(command.value.text)
-                                .setMaxSuggestions(2).setWorkingDir(shell.currentWorkingDir.toString()).build()
-                        ).suggestionsList
-                    }
-                    val historySuggestions = runBlocking {
-                        hostAgent.historyManagerClient.searchHistory(
-                            HistoryQuery.newBuilder().setPrefix(command.value.text)
-                                .setLimit(5).build()
-                        )
-                    }.searchResultList
+                    scope.launch {
+                        val autoCompleteSuggestions = async {
+                            hostAgent.autoCompleteClient.autoComplete(
+                                CommandContext.newBuilder().setCommand(command.value.text)
+                                    .setMaxSuggestions(3).setWorkingDir(shell.currentWorkingDir.toString()).build()
+                            ).suggestionsList
+                        }
+                        val historySuggestions = async {
+                            hostAgent.historyManagerClient.searchHistory(
+                                HistoryQuery.newBuilder().setPrefix(command.value.text)
+                                    .setLimit(5).build()
+                            ).searchResultList
+                        }
 
-                    val suggestions = autoCompleteSuggestions + historySuggestions
-                    commandSuggestions.value = suggestions.distinct()
+                        listOf(autoCompleteSuggestions, historySuggestions).awaitAll()
+                        val suggestions = autoCompleteSuggestions.getCompleted() + historySuggestions.getCompleted()
+                        suggestionIdx.value = -1
+                        commandSuggestions.value = suggestions.distinct()
+                    }
                 },
                 placeholder = { Text("Run Command here. Press Tab for Auto-Complete") },
                 leadingIcon = { PromptIcon() },
