@@ -1,7 +1,7 @@
 package com.kotlang.shellCommands
 
 import com.kotlang.hostAgent
-import com.kotlang.omnishell.CommandInput
+import com.kotlang.omnishell.CommandContext
 import com.kotlang.omnishell.CommandOutput
 import com.kotlang.ui.shell.CommandExecutionCard
 import com.kotlang.ui.shell.Shell
@@ -12,7 +12,7 @@ import java.nio.file.Path
 class ChangeDirectory: ShellCommand() {
     override fun isApplicable(command: String): Boolean = command.startsWith("cd")
 
-    override fun execute(cmdInput: CommandInput, shell: Shell): CommandExecutionCard {
+    override fun execute(cmdInput: CommandContext, shell: Shell): CommandExecutionCard {
         val response = runBlocking { hostAgent.fileSystemClient.changeDirectory(cmdInput) }
         val cmdOutputDoc = mutableListOf<CommandOutput>()
 

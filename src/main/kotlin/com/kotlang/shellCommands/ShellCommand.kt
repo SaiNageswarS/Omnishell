@@ -1,19 +1,19 @@
 package com.kotlang.shellCommands
 
-import com.kotlang.omnishell.CommandInput
+import com.kotlang.omnishell.CommandContext
 import com.kotlang.ui.shell.CommandExecutionCard
 import com.kotlang.ui.shell.Shell
 
 abstract class ShellCommand {
     abstract fun isApplicable(command: String): Boolean
-    abstract fun execute(cmdInput: CommandInput, shell: Shell): CommandExecutionCard
+    abstract fun execute(cmdInput: CommandContext, shell: Shell): CommandExecutionCard
 
     companion object {
-        fun getExecutionCard(cmdInput: CommandInput, shell: Shell): CommandExecutionCard {
+        fun getExecutionCard(cmdInput: CommandContext, shell: Shell): CommandExecutionCard {
             val plugins = listOf(ChangeDirectory(), Clear(), EditorCommand(), SshCommand())
 
             for(plugin in plugins) {
-                if (plugin.isApplicable(cmdInput.commandAndArguments)) {
+                if (plugin.isApplicable(cmdInput.command)) {
                     return plugin.execute(cmdInput, shell)
                 }
             }

@@ -18,7 +18,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kotlang.hostAgent
-import com.kotlang.omnishell.CommandInput
+import com.kotlang.omnishell.CommandContext
+import com.kotlang.omnishell.CommandId
+import com.kotlang.omnishell.CommandInputById
 import com.kotlang.omnishell.CommandOutput
 import com.kotlang.ui.PromptIcon
 import com.kotlang.util.Ticker
@@ -28,18 +30,19 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.awt.event.KeyEvent
 
 class CommandExecutionCard(
-    private val cmd: CommandInput,
-    private val document: MutableList<CommandOutput> = mutableListOf(),
+    private val cmd: CommandContext,
+    private var document: MutableList<CommandOutput> = mutableListOf(),
     initialStatus: CommandOutput.Status = CommandOutput.Status.INIT
     ) {
     private val state= mutableStateOf(initialStatus)
+    private lateinit var commandId: String
 
     //polling document for output
     private val ticker: Ticker = Ticker()
-    private val cmdInputChannel = Channel<CommandInput>()
 
     @Composable
     private fun CommandStateIcon(state: CommandOutput.Status) {
@@ -61,7 +64,7 @@ class CommandExecutionCard(
     private fun RunningProcessInput() {
         val scope = rememberCoroutineScope()
         val processInput = remember { mutableStateOf("") }
-        val isTextMasked = remember { mutableStateOf(cmd.commandAndArguments.startsWith("sudo")) }
+        val isTextMasked = remember { mutableStateOf(cmd.command.startsWith("sudo")) }
 
         TextField(
             value = processInput.value,
@@ -102,7 +105,9 @@ class CommandExecutionCard(
 
                             val input = processInput.value+"\n\r"
                             //don't close the writer
-                            scope.launch {  cmdInputChannel.send(CommandInput.newBuilder().setInput(input).build()) }
+                            scope.launch {  hostAgent.commandExecutionClient.giveInput(
+                                CommandInputById.newBuilder().setCmdId(commandId).setInput(input).build()
+                            ) }
 
                             val displayText = if (!isTextMasked.value) input
                                 else "\n\r"
@@ -141,10 +146,23 @@ class CommandExecutionCard(
         }
     }
 
-    private fun sendCommandInput(): Flow<CommandInput> = flow {
-        emit(cmd)
-        for (cmdInput in cmdInputChannel) {
-            emit(cmdInput)
+    private suspend fun pollExecutionClient() {
+        if (state.value == CommandOutput.Status.INIT) {
+            commandId = hostAgent.commandExecutionClient.initiateCommand(cmd).id
+
+            hostAgent.commandExecutionClient.runCommand(
+                CommandId.newBuilder().setId(commandId).build()
+            ).collect {
+                if (document.isEmpty() || document.last().format != it.format) {
+                    document.add(it)
+                } else {
+                    val out = CommandOutput.newBuilder().setText(document.last().text + it.text)
+                        .setFormat(it.format).build()
+                    document[document.size-1] = out
+                }
+
+                state.value = it.status
+            }
         }
     }
 
@@ -158,7 +176,6 @@ class CommandExecutionCard(
         }
         if (state.value == CommandOutput.Status.FAILED || state.value == CommandOutput.Status.SUCCESS) {
             ticker.stop()
-            cmdInputChannel.close()
         } else {
             ticker.poll()
         }
@@ -175,7 +192,7 @@ class CommandExecutionCard(
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Row(modifier = Modifier.fillMaxWidth(0.93f)) {
                         PromptIcon()
-                        Text(cmd.commandAndArguments, color = Color.DarkGray,
+                        Text(cmd.command, color = Color.DarkGray,
                             style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Bold)
                         )
                     }
@@ -187,16 +204,6 @@ class CommandExecutionCard(
             }
         }
 
-        if (state.value == CommandOutput.Status.INIT) {
-            scope.launch {
-                hostAgent.commandExecutionClient.runCommand(
-                    sendCommandInput()
-                ).collect {
-                    document.add(it)
-                    state.value = it.status
-                }
-            }
-            state.value = CommandOutput.Status.RUNNING
-        }
+        scope.launch { pollExecutionClient() }
     }
 }

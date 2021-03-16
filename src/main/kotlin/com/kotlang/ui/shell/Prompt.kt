@@ -34,7 +34,7 @@ class Prompt(private val shell: Shell) {
 
 
     private fun runCommand(command: String) {
-        val cmd = CommandInput.newBuilder().setCommandAndArguments(command.replace("sudo", "sudo -S "))
+        val cmd = CommandContext.newBuilder().setCommand(command.replace("sudo", "sudo -S "))
             .setWorkingDir(shell.currentWorkingDir.toString()).build()
         val cmdRes = ShellCommand.getExecutionCard(cmd, shell)
 
