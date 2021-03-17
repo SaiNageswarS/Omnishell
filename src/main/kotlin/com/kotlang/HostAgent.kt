@@ -1,12 +1,10 @@
 package com.kotlang
 
-import com.kotlang.omnishell.AutoCompleteServiceGrpcKt
-import com.kotlang.omnishell.CommandExecutionServiceGrpcKt
-import com.kotlang.omnishell.FileSystemManagerGrpcKt
-import com.kotlang.omnishell.HistoryManagerGrpcKt
+import com.kotlang.omnishell.*
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
 import java.io.File
+import java.net.URL
 
 val hostAgent = HostAgent("localhost", 50051)
 
@@ -17,16 +15,26 @@ class HostAgent(host: String, port: Int) {
     val autoCompleteClient: AutoCompleteServiceGrpcKt.AutoCompleteServiceCoroutineStub
     val fileSystemClient: FileSystemManagerGrpcKt.FileSystemManagerCoroutineStub
     val commandExecutionClient: CommandExecutionServiceGrpcKt.CommandExecutionServiceCoroutineStub
+    val environmentClient: EnvironmentManagerGrpcKt.EnvironmentManagerCoroutineStub
+
+    private fun getHostAgentUrl(): URL {
+        val os = System.getProperty("os.name")
+        return when {
+            os.indexOf("win") >= 0 -> object {}.javaClass.getResource("/hostManager/windows/OmnishellProcessManager.exe")
+            os.indexOf("mac") >= 0 -> object {}.javaClass.getResource("/hostManager/mac/OmnishellProcessManager")
+            else -> object {}.javaClass.getResource("/hostManager/linux/OmnishellProcessManager")
+        }
+    }
 
     init {
         //copy host agent to home folder
-        val hostAgentUrl = object {}.javaClass.getResource("/hostManager/linux/OmnishellProcessManager")
-        Runtime.getRuntime().exec(hostAgentUrl.file)
+        Runtime.getRuntime().exec(getHostAgentUrl().file)
 
         channel = ManagedChannelBuilder.forAddress(host, port).usePlaintext().build()
         historyManagerClient = HistoryManagerGrpcKt.HistoryManagerCoroutineStub(channel)
         autoCompleteClient = AutoCompleteServiceGrpcKt.AutoCompleteServiceCoroutineStub(channel)
         fileSystemClient = FileSystemManagerGrpcKt.FileSystemManagerCoroutineStub(channel)
         commandExecutionClient = CommandExecutionServiceGrpcKt.CommandExecutionServiceCoroutineStub(channel)
+        environmentClient = EnvironmentManagerGrpcKt.EnvironmentManagerCoroutineStub(channel)
     }
 }

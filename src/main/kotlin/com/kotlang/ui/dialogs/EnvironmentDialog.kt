@@ -12,23 +12,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.kotlang.Environment
+import com.kotlang.hostAgent
+import com.kotlang.omnishell.EnvironmentRequest
+import kotlinx.coroutines.runBlocking
 
 fun EnvironmentDialog() = Window(title = "Environment") {
-    val environment = Environment.getEnvironment()
+    val environment = runBlocking { hostAgent.environmentClient.getEnvironment(
+        EnvironmentRequest.getDefaultInstance()).envList }
 
     LazyColumn {
-        itemsIndexed(environment.entries.toList()) { _, entry ->
+        itemsIndexed(environment) { _, entry ->
             Row {
                 Text(
-                    entry.key,
+                    entry.split("=")[0],
                     modifier = Modifier.padding(horizontal = 5.dp),
                     style = TextStyle(
                         color = MaterialTheme.colors.primaryVariant,
                         fontWeight = FontWeight.SemiBold,
                     )
                 )
-                Text(entry.value)
+                Text(entry.split("=")[1])
             }
             Divider()
         }
