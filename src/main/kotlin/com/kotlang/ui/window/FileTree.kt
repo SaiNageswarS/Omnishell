@@ -11,9 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.vectorXmlResource
-import java.nio.file.Files
 import java.nio.file.Path
-import java.util.stream.Collectors
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
@@ -21,15 +19,18 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.apache.commons.io.FilenameUtils
+import com.kotlang.hostAgent
+import com.kotlang.omnishell.CommandContext
+import com.kotlang.omnishell.FileDetail
+import kotlinx.coroutines.runBlocking
 
 class FileTree() {
     @Composable
-    private fun FileIcon(fileDetail: Path) {
+    private fun FileIcon(fileDetail: FileDetail) {
         val fileType = when {
-            Files.isDirectory(fileDetail) -> "folder"
-            Files.isExecutable(fileDetail) -> "exe"
-            else -> FilenameUtils.getExtension(fileDetail.toString())
+            fileDetail.isDirectory -> "folder"
+            fileDetail.isExecutable -> "exe"
+            else -> fileDetail.extension
         }
 
         val iconDisplay = when(fileType) {
@@ -53,7 +54,7 @@ class FileTree() {
     }
 
     @Composable
-    private fun FileTreeItem(fileDetail: Path) {
+    private fun FileTreeItem(fileDetail: FileDetail) {
         var fileName = fileDetail.fileName.toString().take(18)
 
         if (fileDetail.fileName.toString().length > 18) {
@@ -65,8 +66,8 @@ class FileTree() {
             ClickableText(
                 AnnotatedString(fileName),
                 onClick = {
-                    if (Files.isDirectory(fileDetail)) {
-                        changePathUiCb(fileDetail)
+                    if (fileDetail.isDirectory) {
+                        changePathUiCb(Path.of(fileDetail.path))
                     }
                 },
                 modifier = Modifier.padding(horizontal = 5.dp, vertical = 0.dp),
@@ -77,8 +78,8 @@ class FileTree() {
 
     @Composable
     fun FileTreeWidget(currentWorkingDir: Path) {
-        val fileList = Files.list(currentWorkingDir)
-            .collect(Collectors.toList())
+        val fileList = runBlocking { hostAgent.fileSystemClient.getFileList(
+            CommandContext.newBuilder().setWorkingDir(currentWorkingDir.toString()).build()).filesList }
 
         Column {
             Text(

@@ -101,7 +101,7 @@ class Prompt(private val shell: Shell) {
                         val autoCompleteSuggestions = async {
                             hostAgent.autoCompleteClient.autoComplete(
                                 CommandContext.newBuilder().setCommand(command.value.text)
-                                    .setMaxSuggestions(3).setWorkingDir(shell.currentWorkingDir.toString()).build()
+                                    .setWorkingDir(shell.currentWorkingDir.toString()).build()
                             ).suggestionsList
                         }
                         val historySuggestions = async {
