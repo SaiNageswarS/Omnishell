@@ -23,7 +23,7 @@ class ChangeDirectory: ShellCommand() {
             )
             CommandOutput.Status.FAILED
         } else {
-            changePathUiCb(Path.of(response.outputPath))
+            changePathUiCb(response.outputPath)
             CommandOutput.Status.SUCCESS
         }
 

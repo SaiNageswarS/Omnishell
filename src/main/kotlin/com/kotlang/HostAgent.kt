@@ -1,8 +1,10 @@
 package com.kotlang
 
+import com.google.protobuf.StringValue
 import com.kotlang.omnishell.*
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
+import kotlinx.coroutines.runBlocking
 
 val hostAgent = HostAgent("localhost", 50051)
 
@@ -36,5 +38,11 @@ class HostAgent(host: String, port: Int) {
         fileSystemClient = FileSystemManagerGrpcKt.FileSystemManagerCoroutineStub(channel)
         commandExecutionClient = CommandExecutionServiceGrpcKt.CommandExecutionServiceCoroutineStub(channel)
         environmentClient = EnvironmentManagerGrpcKt.EnvironmentManagerCoroutineStub(channel)
+    }
+
+    fun getHome(): String {
+        return runBlocking {
+            fileSystemClient.getHome(StringValue.getDefaultInstance()).value
+        }
     }
 }

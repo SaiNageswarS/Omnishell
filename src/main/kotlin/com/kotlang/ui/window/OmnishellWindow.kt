@@ -14,7 +14,7 @@ import com.kotlang.ui.shell.Shell
 import com.kotlang.ui.tabs.TabHeader
 import java.nio.file.Path
 
-lateinit var changePathUiCb: (Path) -> Unit
+lateinit var changePathUiCb: (String) -> Unit
 private lateinit var refreshShellTabUICb: (Int) -> Unit
 private var shellRefreshCount = 0
 
@@ -61,7 +61,7 @@ class OmnishellWindow(
             selectedTab.value = tabIndex
             currentTabWorkingDir.value = shells[selectedTab.value].currentWorkingDir
         }
-        changePathUiCb = { newPath: Path ->
+        changePathUiCb = { newPath: String ->
             shells[selectedTab.value].currentWorkingDir = newPath
             currentTabWorkingDir.value = newPath
         }
@@ -74,7 +74,7 @@ class OmnishellWindow(
                 tabs = {
                     //add current tabs
                     for (i in shells.indices) {
-                        val windowTitle = shells[i].currentWorkingDir
+                        val windowTitle = Path.of(shells[i].currentWorkingDir)
                             .fileName.toString()
                         tabHeader.TabHeader(windowTitle, selectedTab.value == i, i)
                     }

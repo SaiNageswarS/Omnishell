@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.kotlang.hostAgent
 import com.kotlang.isOldVersion
 import com.kotlang.ui.Chip
 import com.kotlang.ui.EnvironmentDialog
@@ -20,7 +21,7 @@ import java.nio.file.Path
 import java.util.*
 
 class Shell(var commandExecutionCards: LinkedList<CommandExecutionCard> = LinkedList<CommandExecutionCard>(),
-            var currentWorkingDir: Path = Path.of(System.getProperty("user.home")),
+            var currentWorkingDir: String = hostAgent.getHome(),
             var index: Int = 0) {
     fun addCommandExecution(commandExecution: CommandExecutionCard) {
         commandExecutionCards.addFirst(commandExecution)

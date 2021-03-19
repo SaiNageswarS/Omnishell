@@ -67,7 +67,7 @@ class FileTree() {
                 AnnotatedString(fileName),
                 onClick = {
                     if (fileDetail.isDirectory) {
-                        changePathUiCb(Path.of(fileDetail.path))
+                        changePathUiCb(fileDetail.path)
                     }
                 },
                 modifier = Modifier.padding(horizontal = 5.dp, vertical = 0.dp),
@@ -77,7 +77,7 @@ class FileTree() {
     }
 
     @Composable
-    fun FileTreeWidget(currentWorkingDir: Path) {
+    fun FileTreeWidget(currentWorkingDir: String) {
         val fileList = runBlocking { hostAgent.fileSystemClient.getFileList(
             CommandContext.newBuilder().setWorkingDir(currentWorkingDir.toString()).build()).filesList }
 
