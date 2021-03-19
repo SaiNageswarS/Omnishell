@@ -22,9 +22,11 @@ class ChangeDirectory: ShellCommand() {
                     .setFormat(CommandOutput.TextFormat.ERROR).build()
             )
             CommandOutput.Status.FAILED
-        } else CommandOutput.Status.SUCCESS
+        } else {
+            changePathUiCb(Path.of(response.outputPath))
+            CommandOutput.Status.SUCCESS
+        }
 
-        changePathUiCb(Path.of(response.outputPath))
         return CommandExecutionCard(cmdInput, cmdOutputDoc, cmdOutputStatus)
     }
 }
