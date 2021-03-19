@@ -3,7 +3,6 @@ package com.kotlang
 import com.kotlang.omnishell.*
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
-import java.net.URL
 
 val hostAgent = HostAgent("localhost", 50051)
 
@@ -16,6 +15,8 @@ class HostAgent(host: String, port: Int) {
     val commandExecutionClient: CommandExecutionServiceGrpcKt.CommandExecutionServiceCoroutineStub
     val environmentClient: EnvironmentManagerGrpcKt.EnvironmentManagerCoroutineStub
 
+    val process: Process
+
     private fun getHostAgentUrl(): String {
         val os = System.getProperty("os.name")
         return when {
@@ -27,7 +28,7 @@ class HostAgent(host: String, port: Int) {
 
     init {
         //copy host agent to home folder
-        Runtime.getRuntime().exec(getHostAgentUrl())
+        process = Runtime.getRuntime().exec(getHostAgentUrl())
 
         channel = ManagedChannelBuilder.forAddress(host, port).usePlaintext().build()
         historyManagerClient = HistoryManagerGrpcKt.HistoryManagerCoroutineStub(channel)

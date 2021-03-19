@@ -93,8 +93,9 @@ class CommandExecutionCard(
                     on(Key.CtrlLeft + Key.W) {
                         document.add(CommandOutput.newBuilder().setText("^W (Interrupted)")
                             .setFormat(CommandOutput.TextFormat.ERROR).build())
-//                        process!!.destroy()
-                        state.value = CommandOutput.Status.FAILED
+                        runBlocking { hostAgent.commandExecutionClient.killProcess(
+                            CommandId.newBuilder().setId(commandId).build()
+                        ) }
                     }
                 }
                 .onPreviewKeyEvent { keyEvent ->
