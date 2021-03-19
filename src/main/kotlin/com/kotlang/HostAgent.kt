@@ -19,7 +19,7 @@ class HostAgent(host: String, port: Int) {
     private fun getHostAgentUrl(): String {
         val os = System.getProperty("os.name")
         return when {
-            os.indexOf("win") >= 0 -> "./hostManager/windows/OmnishellProcessManager.exe"
+            os.indexOf("Win") >= 0 -> "./hostManager/windows/OmnishellProcessManager.exe"
             os.indexOf("mac") >= 0 -> "./hostManager/mac/OmnishellProcessManager"
             else -> "./hostManager/linux/OmnishellProcessManager"
         }
