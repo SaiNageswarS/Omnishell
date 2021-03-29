@@ -14,10 +14,9 @@ import androidx.compose.ui.unit.dp
 import com.kotlang.hostAgent
 import com.kotlang.isOldVersion
 import com.kotlang.ui.Chip
-import com.kotlang.ui.EnvironmentDialog
+import com.kotlang.ui.dialogs.EnvironmentDialog
 import com.kotlang.ui.window.refreshShell
 import java.net.InetAddress
-import java.nio.file.Path
 import java.util.*
 
 class Shell(var commandExecutionCards: LinkedList<CommandExecutionCard> = LinkedList<CommandExecutionCard>(),
@@ -36,7 +35,6 @@ class Shell(var commandExecutionCards: LinkedList<CommandExecutionCard> = Linked
     @Composable
     private fun EnvironmentInfoChips() {
         val hostName = InetAddress.getLocalHost().hostName
-//        val userName = System.getProperty("user.name")
 
         Row(
             horizontalArrangement = Arrangement.End,

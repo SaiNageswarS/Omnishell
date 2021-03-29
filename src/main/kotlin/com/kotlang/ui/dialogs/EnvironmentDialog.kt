@@ -1,4 +1,4 @@
-package com.kotlang.ui
+package com.kotlang.ui.dialogs
 
 import androidx.compose.desktop.Window
 import androidx.compose.foundation.layout.Row
