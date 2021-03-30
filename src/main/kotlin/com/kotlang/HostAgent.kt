@@ -23,14 +23,22 @@ class HostAgent(host: String, port: Int) {
         val os = System.getProperty("os.name")
         return when {
             os.indexOf("Win") >= 0 -> "$hostManagerPath/hostManager/windows/OmnishellProcessManager.exe"
-            os.indexOf("mac") >= 0 -> "$hostManagerPath/hostManager/mac/OmnishellProcessManager"
-            else -> "$hostManagerPath/hostManager/linux/OmnishellProcessManager"
+            os.indexOf("mac") >= 0 -> {
+                val hostAgentUrl = "$hostManagerPath/hostManager/mac/OmnishellProcessManager"
+                Runtime.getRuntime().exec("chmod +x $hostAgentUrl")
+                hostAgentUrl
+            }
+            else -> {
+                val hostAgentUrl = "$hostManagerPath/hostManager/linux/OmnishellProcessManager"
+                Runtime.getRuntime().exec("chmod +x $hostAgentUrl")
+                hostAgentUrl
+            }
         }
     }
 
     init {
-        //copy host agent to home folder
-        process = Runtime.getRuntime().exec(getHostAgentUrl())
+        val hostAgentUrl = getHostAgentUrl()
+        process = Runtime.getRuntime().exec("$hostAgentUrl :$port $hostManagerPath/hostManager/app.log")
 
         channel = ManagedChannelBuilder.forAddress(host, port).usePlaintext().build()
         historyManagerClient = HistoryManagerGrpcKt.HistoryManagerCoroutineStub(channel)
