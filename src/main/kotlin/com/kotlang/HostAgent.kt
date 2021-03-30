@@ -20,9 +20,9 @@ class HostAgent(host: String, port: Int) {
     val process: Process
 
     private fun getHostAgentUrl(): String {
-        val os = System.getProperty("os.name")
+        val os = System.getProperty("os.name").toLowerCase()
         return when {
-            os.indexOf("Win") >= 0 -> "$hostManagerPath/hostManager/windows/OmnishellProcessManager.exe"
+            os.indexOf("win") >= 0 -> "$hostManagerPath/hostManager/windows/OmnishellProcessManager.exe"
             os.indexOf("mac") >= 0 -> {
                 val hostAgentUrl = "$hostManagerPath/hostManager/mac/OmnishellProcessManager"
                 Runtime.getRuntime().exec("chmod +x $hostAgentUrl")
