@@ -114,7 +114,7 @@ compose.desktop {
                 }
                 notarization {
                     appleID.set("sainageswar@alumni.iitm.ac.in")
-                    password.set("passwordPlaceholder")
+                    // password.set("passwordPlaceholder")
                 }
 
                 iconFile.set(project.file("src/main/resources/osIcon.icns"))

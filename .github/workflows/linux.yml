@@ -1,0 +1,37 @@
+name: Build-Linux-App
+
+on:
+  push:
+    branches: [ release ]
+  pull_request:
+    branches: [ release ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+          ref: release
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 15
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew packageDeb
+
+      - name: Upload Release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: build/compose/binaries/main/deb/omnishell_1.0.0-1_amd64.deb
+          asset_name: omnishell_1.0.0-1_amd64.deb
+          tag: Linux-0.0.5
+          overwrite: true
+          body: "Linux Debian file"

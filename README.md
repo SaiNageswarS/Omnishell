@@ -15,9 +15,8 @@ Modern shell combining the flexibility of graphical interface with the power of 
 5. Supports all streams of a command execution - input, output, error.
 
 # Downloads
-MacOS: https://github.com/SaiNageswarS/Omnishell/releases/download/Mac-0.0.4/OmniShell-1.0.0.dmg
-
-Linux: https://github.com/SaiNageswarS/Omnishell/releases/download/Linux-0.0.4/omnishell_1.0.0-1_amd64.deb
+Get latest version of Omnishell for your OS from:
+https://github.com/SaiNageswarS/Omnishell/releases
 
 # Notes
 1. For adding to path edit ~/config/OmnishellEnv.json.

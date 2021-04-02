@@ -1,0 +1,34 @@
+name: Build-Windows-App
+
+on:
+  push:
+    branches: [ release ]
+  pull_request:
+    branches: [ release ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+          ref: release
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 15
+
+      - name: Build with Gradle
+        run: ./gradlew.bat packageMsi
+
+      - name: Upload Release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: build\compose\binaries\main\msi\OmniShell-1.0.0.msi
+          asset_name: OmniShell-1.0.0.msi
+          tag: Windows-0.0.5
+          overwrite: true
+          body: "Windows exe file"

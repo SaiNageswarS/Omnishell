@@ -1,0 +1,43 @@
+name: Build-Mac-App
+
+on:
+  push:
+    branches: [ release ]
+  pull_request:
+    branches: [ release ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+          ref: release
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 15
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Setup Codesigning Certs
+        uses: apple-actions/import-codesign-certs@v1
+        with:
+          p12-file-base64: ${{ secrets.OMNISHELL_CERT }}
+          p12-password: ${{ secrets.OMNISHELL_CERT_PSWD }}
+
+      - name: Build with Gradle
+        run: ./gradlew packageDmg -Pcompose.desktop.mac.notarization.password=${{ secrets.NOTARIZATION_PASSWORD }}
+
+      - name: Upload Release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: build/compose/binaries/main/dmg/OmniShell-1.0.0.dmg
+          asset_name: OmniShell-1.0.0.dmg
+          tag: Mac-0.0.5
+          overwrite: true
+          body: "Mac OS DMG"
