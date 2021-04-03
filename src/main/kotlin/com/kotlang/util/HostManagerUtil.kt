@@ -8,8 +8,11 @@ import java.nio.file.StandardCopyOption
 import java.io.IOException
 import java.util.zip.ZipEntry
 import java.io.FileInputStream
+import java.io.InputStream
 import java.nio.file.Path
+import java.security.SecureRandom
 import java.util.zip.ZipInputStream
+import javax.net.ssl.*
 import kotlin.system.exitProcess
 
 object HostManagerUtil {
@@ -19,10 +22,19 @@ object HostManagerUtil {
     @JvmStatic
     private val logger = LogManager.getLogger(javaClass)
 
+    private fun getUrlDownloadStream(): InputStream {
+        val ctx: SSLContext = SSLContext.getInstance("TLSv1.2")
+        ctx.init(null, null, SecureRandom())
+
+        val con = URL(downloadUrl).openConnection() as HttpsURLConnection
+        con.sslSocketFactory = ctx.socketFactory
+        return con.inputStream
+    }
+
     fun downloadHostManager(dest: Path) {
         logger.info("Downloading host manager from $downloadUrl to $dest")
         try{
-            val stream = URL(downloadUrl).openStream()
+            val stream = getUrlDownloadStream()
             Files.copy(stream, Path.of(dest.toString(), "hostManager.zip"), StandardCopyOption.REPLACE_EXISTING)
             unzipFolder(Path.of(dest.toString(), "hostManager.zip"), Path.of(dest.toString(), "hostManager"))
             Files.delete(Paths.get(dest.toString(), "hostManager.zip"))
