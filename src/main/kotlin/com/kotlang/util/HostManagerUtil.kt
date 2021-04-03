@@ -1,5 +1,6 @@
 package com.kotlang.util
 
+import org.apache.logging.log4j.LogManager
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -9,16 +10,27 @@ import java.util.zip.ZipEntry
 import java.io.FileInputStream
 import java.nio.file.Path
 import java.util.zip.ZipInputStream
+import kotlin.system.exitProcess
 
 object HostManagerUtil {
     private const val downloadUrl = "https://github.com/SaiNageswarS/OmnishellProcessManagerModel/" +
             "releases/download/master/hostManager.zip"
 
-    fun downloadHostManager(dest: String) {
-        val stream = URL(downloadUrl).openStream()
-        Files.copy(stream, Paths.get("$dest/hostManager.zip"), StandardCopyOption.REPLACE_EXISTING)
-        unzipFolder(Path.of("$dest/hostManager.zip"), Path.of("$dest/hostManager"))
-        Files.delete(Paths.get("$dest/hostManager.zip"))
+    @JvmStatic
+    private val logger = LogManager.getLogger(javaClass)
+
+    fun downloadHostManager(dest: Path) {
+        logger.info("Downloading host manager from $downloadUrl to $dest")
+        try{
+            val stream = URL(downloadUrl).openStream()
+            Files.copy(stream, Path.of(dest.toString(), "hostManager.zip"), StandardCopyOption.REPLACE_EXISTING)
+            unzipFolder(Path.of(dest.toString(), "hostManager.zip"), Path.of(dest.toString(), "hostManager"))
+            Files.delete(Paths.get(dest.toString(), "hostManager.zip"))
+        } catch (e: Exception) {
+            logger.error("Failed getting host manager", e)
+            exitProcess(1)
+        }
+        logger.info("Finished downloading host manager")
     }
 
     @Throws(IOException::class)

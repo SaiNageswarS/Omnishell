@@ -19,13 +19,14 @@ import javax.imageio.ImageIO
 
 val iconUrl: URL = object {}.javaClass.getResource("/osIcon.png")
 val isOldVersion = VersionVerificationUtil().checkIsOldVersion()
-val hostManagerPath: String = System.getProperty("user.home")
+val hostManagerPath: Path = Path.of(System.getProperty("user.home"), ".omnishell")
 
 fun main() {
     val splashWindow = SplashWindow()
     splashWindow.create()
 
     if (!Files.exists(Path.of("$hostManagerPath/hostManager"))) {
+        Files.createDirectories(hostManagerPath)
         HostManagerUtil.downloadHostManager(hostManagerPath)
     }
     //booting hostAgent while splash screen is running

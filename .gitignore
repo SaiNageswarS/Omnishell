@@ -4,3 +4,4 @@ build
 .DS_Store
 generated
 app.log
+logs
