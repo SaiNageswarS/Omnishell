@@ -2,16 +2,14 @@ package com.kotlang.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -21,18 +19,40 @@ import androidx.compose.ui.unit.sp
 import kotlin.random.Random
 
 @Composable
-fun Chip(text: String, onClick: () -> Unit) {
+fun Chip(text: String, dropDownItems: List<String> = listOf(), onSelect: (idx: Int) -> Unit) {
     val colors = listOf(
         Color(red = 253, green = 224, blue = 222),
         Color(red = 231, green = 252, blue = 223),
         Color(red = 254, green = 252, blue = 218),
     )
 
-    Box(Modifier.clickable { onClick() }) {
-        Text(text, modifier = Modifier
-            .background(color = colors[Random.nextInt(0, 3)],
-                shape = RoundedCornerShape(15.dp))
-            .padding(8.dp))
+    val showDropDown = remember { mutableStateOf(false) }
+
+    Column {
+        Box(Modifier.
+            background(color = colors[Random.nextInt(0, 3)],
+                shape = RoundedCornerShape(15.dp)).
+            padding(8.dp).
+            clickable { showDropDown.value = true }) {
+                Row {
+                    Text(text,
+                        color = Color.Black,
+                    )
+
+                    Icon(Icons.Default.ArrowDropDown, contentDescription = "", tint = Color.Black)
+                }
+            }
+
+        DropdownMenu(expanded = showDropDown.value, onDismissRequest = { showDropDown.value = false }) {
+            dropDownItems.forEachIndexed { idx, item ->
+                DropdownMenuItem(onClick = {
+                    onSelect(idx)
+                    showDropDown.value = false
+                }) {
+                    Text(item, color = Color.Black)
+                }
+            }
+        }
     }
 }
 

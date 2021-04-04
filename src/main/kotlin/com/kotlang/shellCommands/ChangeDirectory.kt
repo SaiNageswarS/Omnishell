@@ -5,9 +5,7 @@ import com.kotlang.omnishell.CommandContext
 import com.kotlang.omnishell.CommandOutput
 import com.kotlang.ui.shell.CommandExecutionCard
 import com.kotlang.ui.shell.Shell
-import com.kotlang.ui.window.changePathUiCb
 import kotlinx.coroutines.runBlocking
-import java.nio.file.Path
 
 class ChangeDirectory: ShellCommand() {
     override fun isApplicable(command: String): Boolean = command.startsWith("cd")
@@ -23,7 +21,7 @@ class ChangeDirectory: ShellCommand() {
             )
             CommandOutput.Status.FAILED
         } else {
-            changePathUiCb(response.outputPath)
+            shell.changeDirectory(response.outputPath)
             CommandOutput.Status.SUCCESS
         }
 

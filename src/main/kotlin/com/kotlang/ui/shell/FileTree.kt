@@ -1,4 +1,4 @@
-package com.kotlang.ui.window
+package com.kotlang.ui.shell
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,7 +11,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.vectorXmlResource
-import java.nio.file.Path
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
@@ -24,7 +23,7 @@ import com.kotlang.omnishell.CommandContext
 import com.kotlang.omnishell.FileDetail
 import kotlinx.coroutines.runBlocking
 
-class FileTree() {
+class FileTree(private val shell: Shell) {
     @Composable
     private fun FileIcon(fileDetail: FileDetail) {
         val fileType = when {
@@ -67,7 +66,7 @@ class FileTree() {
                 AnnotatedString(fileName),
                 onClick = {
                     if (fileDetail.isDirectory) {
-                        changePathUiCb(fileDetail.path)
+                        shell.changeDirectory(fileDetail.path)
                     }
                 },
                 modifier = Modifier.padding(horizontal = 5.dp, vertical = 0.dp),
