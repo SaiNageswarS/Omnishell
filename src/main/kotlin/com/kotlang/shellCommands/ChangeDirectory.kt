@@ -27,6 +27,6 @@ class ChangeDirectory: ShellCommand() {
             CommandOutput.Status.SUCCESS
         }
 
-        return CommandExecutionCard(cmdInput, cmdOutputDoc, cmdOutputStatus)
+        return CommandExecutionCard(cmdInput, cmdOutputDoc, null, cmdOutputStatus)
     }
 }

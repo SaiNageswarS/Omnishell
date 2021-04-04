@@ -10,7 +10,8 @@ abstract class ShellCommand {
 
     companion object {
         fun getExecutionCard(cmdInput: CommandContext, shell: Shell): CommandExecutionCard {
-            val plugins = listOf(ChangeDirectory(), Clear(), EditorCommand(), SshCommand())
+            val plugins = listOf(ChangeDirectory(), Clear(), EditorCommand(), SshCommand(),
+                ExportCommand())
 
             for(plugin in plugins) {
                 if (plugin.isApplicable(cmdInput.command)) {

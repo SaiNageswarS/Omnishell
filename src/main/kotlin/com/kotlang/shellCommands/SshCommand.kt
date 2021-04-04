@@ -12,7 +12,7 @@ class SshCommand: ShellCommand() {
         val err = CommandOutput.newBuilder().setText("An awesome editor is coming soon.")
             .setFormat(CommandOutput.TextFormat.ERROR).build()
 
-        return CommandExecutionCard(cmdInput, mutableListOf(err),
+        return CommandExecutionCard(cmdInput, mutableListOf(err), null,
             CommandOutput.Status.FAILED)
     }
 }

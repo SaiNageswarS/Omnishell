@@ -36,29 +36,14 @@ import java.awt.event.KeyEvent
 class CommandExecutionCard(
     private val cmd: CommandContext,
     private var document: MutableList<CommandOutput> = mutableListOf(),
-    initialStatus: CommandOutput.Status = CommandOutput.Status.INIT
+    private var actions: CommandActions? = null,
+    initialStatus: CommandOutput.Status = CommandOutput.Status.INIT,
     ) {
     private val state= mutableStateOf(initialStatus)
     private lateinit var commandId: String
 
     //polling document for output
     private val ticker: Ticker = Ticker()
-
-    @Composable
-    private fun CommandStateIcon(state: CommandOutput.Status) {
-        when(state) {
-            CommandOutput.Status.SUCCESS ->
-                Icon(
-                    Icons.Default.CheckCircle, contentDescription = "",
-                    modifier = Modifier.size(25.dp), tint = Color.Green)
-            CommandOutput.Status.FAILED ->
-                Icon(
-                    Icons.Default.Warning, contentDescription = "",
-                    modifier = Modifier.size(25.dp), tint = Color.Red)
-            else ->
-                CircularProgressIndicator(modifier = Modifier.size(25.dp))
-        }
-    }
 
     @Composable
     private fun RunningProcessInput() {
@@ -128,7 +113,9 @@ class CommandExecutionCard(
     @Composable
     private fun OutputDisplay(tick: Int) {
         synchronized(this) {
-            Column {
+            Column(
+                modifier = Modifier.padding(horizontal = 0.dp, vertical = 10.dp)
+            ) {
                 for (child in document) {
                     when(child.format) {
                         CommandOutput.TextFormat.ERROR -> Text(child.text.sanitize(), color = Color.Red)
@@ -202,6 +189,12 @@ class CommandExecutionCard(
                 }
 
                 OutputDisplay(currentTick.value)
+                if (actions != null) {
+                    CommandActionsPrompt(actions!!) {
+                        actions = null
+                        currentTick.value = currentTick.value + 1
+                    }
+                }
             }
         }
 

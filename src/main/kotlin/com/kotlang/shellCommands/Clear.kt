@@ -10,6 +10,6 @@ class Clear: ShellCommand() {
 
     override fun execute(cmdInput: CommandContext, shell: Shell): CommandExecutionCard {
         shell.clearHistory()
-        return CommandExecutionCard(cmdInput, mutableListOf(), CommandOutput.Status.SUCCESS)
+        return CommandExecutionCard(cmdInput, mutableListOf(), null, CommandOutput.Status.SUCCESS)
     }
 }
