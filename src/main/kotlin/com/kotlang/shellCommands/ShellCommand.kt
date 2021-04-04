@@ -19,7 +19,7 @@ abstract class ShellCommand {
                 }
             }
 
-            return CommandExecutionCard(cmdInput)
+            return CommandExecutionCard(cmdInput, shell)
         }
     }
 }

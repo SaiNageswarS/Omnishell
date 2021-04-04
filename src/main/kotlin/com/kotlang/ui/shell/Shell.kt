@@ -12,15 +12,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.kotlang.hostAgent
+import com.kotlang.HostAgent
 import com.kotlang.isOldVersion
 import com.kotlang.ui.window.refreshShell
+import com.kotlang.util.PortUtil
 import java.util.*
 
 class Shell(var commandExecutionCards: LinkedList<CommandExecutionCard> = LinkedList<CommandExecutionCard>(),
             var index: Int = 0,
-            currentWorkingDir: String = hostAgent.getHome()) {
-    private val currentWorkingDirState = mutableStateOf(currentWorkingDir)
+            var hostAgent: HostAgent = HostAgent("localhost", PortUtil.getFreePort())) {
+    private val currentWorkingDirState = mutableStateOf(hostAgent.getHome())
 
     fun addCommandExecution(commandExecution: CommandExecutionCard) {
         commandExecutionCards.addFirst(commandExecution)
@@ -35,6 +36,10 @@ class Shell(var commandExecutionCards: LinkedList<CommandExecutionCard> = Linked
     fun getCurrentWorkingDir(): String = currentWorkingDirState.value
     fun changeDirectory(newPath: String) {
         currentWorkingDirState.value = newPath
+    }
+
+    fun destroy() {
+        hostAgent.process.destroy()
     }
 
     @Composable
@@ -71,7 +76,7 @@ class Shell(var commandExecutionCards: LinkedList<CommandExecutionCard> = Linked
     fun Draw(shellStateVersion: Int) {
         val shell = this
 
-        ShellHeader().Draw("localhost", currentWorkingDirState.value)
+        ShellHeader(shell).Draw("localhost", currentWorkingDirState.value)
         Row(modifier = Modifier.background(Color(red = 34, green = 51, blue = 68))) {
             FileTree(shell).FileTreeWidget(currentWorkingDirState.value)
             ShellCommandPallete(shellStateVersion)

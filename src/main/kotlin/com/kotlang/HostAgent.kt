@@ -6,8 +6,6 @@ import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
 import kotlinx.coroutines.runBlocking
 
-val hostAgent = HostAgent("localhost", 50051)
-
 class HostAgent(host: String, port: Int) {
     private val channel: ManagedChannel
 

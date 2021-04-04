@@ -21,7 +21,7 @@ import com.kotlang.remoting.Wsl
 import com.kotlang.ui.Chip
 import com.kotlang.ui.dialogs.EnvironmentDialog
 
-class ShellHeader {
+class ShellHeader(private val shell: Shell) {
     @Composable
     fun currentHostInfo(host: String, currentWorkingDir: String) {
         Row(modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp)) {
@@ -52,7 +52,7 @@ class ShellHeader {
             Card(
                 backgroundColor =  Color(red = 254, green = 252, blue = 218),
                 shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp),
-                modifier = Modifier.fillMaxWidth(0.8f).clickable { EnvironmentDialog() }
+                modifier = Modifier.fillMaxWidth(0.8f).clickable { EnvironmentDialog(shell) }
             ) {
                 Text(
                     "Env",

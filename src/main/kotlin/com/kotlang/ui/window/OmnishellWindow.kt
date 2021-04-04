@@ -16,10 +16,12 @@ fun refreshShell() {
     refreshShellTabUICb(++shellRefreshCount)
 }
 
-class OmnishellWindow(
-    private val shells: MutableList<Shell> = mutableListOf(Shell(index = 0), Shell(index = 1)),
-) {
+/**
+ * There will be only one window :)
+ */
+object OmnishellWindow {
     private lateinit var changeTabUICb: (Int) -> Unit
+    private val shells: MutableList<Shell> = mutableListOf(Shell(index = 0), Shell(index = 1))
 
     fun changeTab(newTabIndex: Int) {
         changeTabUICb(newTabIndex)
@@ -39,6 +41,12 @@ class OmnishellWindow(
         val newTab = Shell(index = shells.size)
         shells.add(newTab)
         changeTabUICb(newTab.index)
+    }
+
+    fun destroy() {
+        for (shell in shells) {
+            shell.destroy()
+        }
     }
 
     @Composable

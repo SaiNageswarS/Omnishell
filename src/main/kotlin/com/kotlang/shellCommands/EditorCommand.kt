@@ -12,7 +12,7 @@ class EditorCommand: ShellCommand() {
     override fun execute(cmdInput: CommandContext, shell: Shell): CommandExecutionCard {
         val err = CommandOutput.newBuilder().setText("An awesome editor is coming soon.")
             .setFormat(CommandOutput.TextFormat.ERROR).build()
-        return CommandExecutionCard(cmdInput, mutableListOf(err), null,
+        return CommandExecutionCard(cmdInput, shell, mutableListOf(err), null,
             CommandOutput.Status.FAILED)
     }
 }

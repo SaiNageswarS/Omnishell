@@ -4,9 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,7 +15,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kotlang.hostAgent
 import com.kotlang.omnishell.CommandContext
 import com.kotlang.omnishell.CommandId
 import com.kotlang.omnishell.CommandInputById
@@ -35,6 +32,7 @@ import java.awt.event.KeyEvent
 
 class CommandExecutionCard(
     private val cmd: CommandContext,
+    private val shell: Shell,
     private var document: MutableList<CommandOutput> = mutableListOf(),
     private var actions: CommandActions? = null,
     initialStatus: CommandOutput.Status = CommandOutput.Status.INIT,
@@ -78,7 +76,7 @@ class CommandExecutionCard(
                     on(Key.CtrlLeft + Key.W) {
                         document.add(CommandOutput.newBuilder().setText("^W (Interrupted)")
                             .setFormat(CommandOutput.TextFormat.ERROR).build())
-                        runBlocking { hostAgent.commandExecutionClient.killProcess(
+                        runBlocking { shell.hostAgent.commandExecutionClient.killProcess(
                             CommandId.newBuilder().setId(commandId).build()
                         ) }
                     }
@@ -91,7 +89,7 @@ class CommandExecutionCard(
 
                             val input = processInput.value+"\n\r"
                             //don't close the writer
-                            scope.launch {  hostAgent.commandExecutionClient.giveInput(
+                            scope.launch {  shell.hostAgent.commandExecutionClient.giveInput(
                                 CommandInputById.newBuilder().setCmdId(commandId).setInput(input).build()
                             ) }
 
@@ -136,9 +134,9 @@ class CommandExecutionCard(
 
     private suspend fun pollExecutionClient() {
         if (state.value == CommandOutput.Status.INIT) {
-            commandId = hostAgent.commandExecutionClient.initiateCommand(cmd).id
+            commandId = shell.hostAgent.commandExecutionClient.initiateCommand(cmd).id
 
-            hostAgent.commandExecutionClient.runCommand(
+            shell.hostAgent.commandExecutionClient.runCommand(
                 CommandId.newBuilder().setId(commandId).build()
             ).collect {
                 if (document.isEmpty() || document.last().format != it.format) {

@@ -14,7 +14,6 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import com.kotlang.hostAgent
 import com.kotlang.omnishell.*
 import com.kotlang.shellCommands.ShellCommand
 import com.kotlang.ui.PromptIcon
@@ -40,7 +39,7 @@ class Prompt(private val shell: Shell) {
 
         shell.addCommandExecution(cmdRes)
         runBlocking {
-            hostAgent.historyManagerClient.addToHistory(
+            shell.hostAgent.historyManagerClient.addToHistory(
                 HistoryEntry.newBuilder().setCommand(command).build()
             )
         }
@@ -99,13 +98,13 @@ class Prompt(private val shell: Shell) {
                     command.value = newVal
                     scope.launch {
                         val autoCompleteSuggestions = async {
-                            hostAgent.autoCompleteClient.autoComplete(
+                            shell.hostAgent.autoCompleteClient.autoComplete(
                                 CommandContext.newBuilder().setCommand(command.value.text)
                                     .setWorkingDir(shell.getCurrentWorkingDir()).build()
                             ).suggestionsList
                         }
                         val historySuggestions = async {
-                            hostAgent.historyManagerClient.searchHistory(
+                            shell.hostAgent.historyManagerClient.searchHistory(
                                 HistoryQuery.newBuilder().setPrefix(command.value.text)
                                     .setLimit(5).build()
                             ).searchResultList

@@ -18,7 +18,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.kotlang.hostAgent
 import com.kotlang.omnishell.CommandContext
 import com.kotlang.omnishell.FileDetail
 import kotlinx.coroutines.runBlocking
@@ -77,7 +76,7 @@ class FileTree(private val shell: Shell) {
 
     @Composable
     fun FileTreeWidget(currentWorkingDir: String) {
-        val fileList = runBlocking { hostAgent.fileSystemClient.getFileList(
+        val fileList = runBlocking { shell.hostAgent.fileSystemClient.getFileList(
             CommandContext.newBuilder().setWorkingDir(currentWorkingDir.toString()).build()).filesList }
 
         Column {

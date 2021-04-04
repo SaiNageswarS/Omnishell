@@ -12,12 +12,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.kotlang.hostAgent
 import com.kotlang.omnishell.EnvironmentRequest
+import com.kotlang.ui.shell.Shell
 import kotlinx.coroutines.runBlocking
 
-fun EnvironmentDialog() = Window(title = "Environment") {
-    val environment = runBlocking { hostAgent.environmentClient.getEnvironment(
+fun EnvironmentDialog(shell: Shell) = Window(title = "Environment") {
+    val environment = runBlocking { shell.hostAgent.environmentClient.getEnvironment(
         EnvironmentRequest.getDefaultInstance()).envList }
 
     LazyColumn {
