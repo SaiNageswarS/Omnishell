@@ -19,6 +19,7 @@ Get latest version of Omnishell for your OS from:
 https://github.com/SaiNageswarS/Omnishell/releases
 
 # Notes
-1. For adding to path edit ~/config/OmnishellEnv.json.
+1. For adding to path, run export PATH=newPath:$PATH. Then click save to store new path permanently. 
+
 
 

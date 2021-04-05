@@ -15,7 +15,7 @@ import java.util.zip.ZipInputStream
 import javax.net.ssl.*
 import kotlin.system.exitProcess
 
-object HostManagerUtil {
+object HostAgentDownloadUtil {
     private const val downloadUrl = "https://github.com/SaiNageswarS/OmnishellProcessManagerModel/" +
             "releases/download/master/hostManager.zip"
 

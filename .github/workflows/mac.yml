@@ -38,6 +38,6 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/compose/binaries/main/dmg/OmniShell-1.0.0.dmg
           asset_name: OmniShell-1.0.0.dmg
-          tag: Mac-0.0.5
+          tag: Mac-0.0.6
           overwrite: true
           body: "Mac OS DMG"

@@ -5,7 +5,7 @@ import androidx.compose.desktop.WindowEvents
 import androidx.compose.material.*
 import com.kotlang.ui.window.OmnishellWindow
 import com.kotlang.ui.window.SplashWindow
-import com.kotlang.util.HostManagerUtil
+import com.kotlang.util.HostAgentDownloadUtil
 import com.kotlang.util.VersionVerificationUtil
 import java.net.URL
 import java.nio.file.Files
@@ -22,7 +22,7 @@ fun main() {
 
     if (!Files.exists(Path.of("$hostManagerPath/hostManager"))) {
         Files.createDirectories(hostManagerPath)
-        HostManagerUtil.downloadHostManager(hostManagerPath)
+        HostAgentDownloadUtil.downloadHostManager(hostManagerPath)
     }
 
     //show splash screen

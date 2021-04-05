@@ -32,6 +32,6 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/compose/binaries/main/deb/omnishell_1.0.0-1_amd64.deb
           asset_name: omnishell_1.0.0-1_amd64.deb
-          tag: Linux-0.0.5
+          tag: Linux-0.0.6
           overwrite: true
           body: "Linux Debian file"

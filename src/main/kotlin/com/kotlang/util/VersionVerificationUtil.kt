@@ -10,7 +10,7 @@ import java.time.Duration
 
 class VersionVerificationUtil(
     private val httpClient: HttpClient = HttpClient.newHttpClient(),
-    private val currentVersion: VersionString = VersionString("0.0.5"),
+    private val currentVersion: VersionString = VersionString("0.0.6"),
     private val os: String = System.getProperty("os.name").split(" ").first()
 ) {
     private val mapper = jacksonObjectMapper()

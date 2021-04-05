@@ -14,23 +14,25 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.kotlang.HostAgent
 import com.kotlang.isOldVersion
-import com.kotlang.ui.window.refreshShell
-import com.kotlang.util.PortUtil
+import com.kotlang.remoting.RemoteTargetManager
+import com.kotlang.ui.window.OmnishellWindow
 import java.util.*
 
 class Shell(var commandExecutionCards: LinkedList<CommandExecutionCard> = LinkedList<CommandExecutionCard>(),
             var index: Int = 0,
-            var hostAgent: HostAgent = HostAgent("localhost", PortUtil.getFreePort())) {
+            val remoteTargetManager: RemoteTargetManager) {
+
+    val hostAgent: HostAgent = HostAgent(remoteTargetManager)
     private val currentWorkingDirState = mutableStateOf(hostAgent.getHome())
 
     fun addCommandExecution(commandExecution: CommandExecutionCard) {
         commandExecutionCards.addFirst(commandExecution)
-        refreshShell()
+        OmnishellWindow.refreshShell()
     }
 
     fun clearHistory() {
         commandExecutionCards = LinkedList<CommandExecutionCard>()
-        refreshShell()
+        OmnishellWindow.refreshShell()
     }
 
     fun getCurrentWorkingDir(): String = currentWorkingDirState.value
@@ -76,7 +78,7 @@ class Shell(var commandExecutionCards: LinkedList<CommandExecutionCard> = Linked
     fun Draw(shellStateVersion: Int) {
         val shell = this
 
-        ShellHeader(shell).Draw("localhost", currentWorkingDirState.value)
+        ShellHeader(shell).Draw(currentWorkingDirState.value)
         Row(modifier = Modifier.background(Color(red = 34, green = 51, blue = 68))) {
             FileTree(shell).FileTreeWidget(currentWorkingDirState.value)
             ShellCommandPallete(shellStateVersion)

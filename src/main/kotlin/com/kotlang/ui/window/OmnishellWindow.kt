@@ -4,43 +4,40 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material.ScrollableTabRow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import com.kotlang.remoting.LocalTargetManager
+import com.kotlang.remoting.RemoteTargetManager
+import com.kotlang.remoting.WslTargetManager
 import com.kotlang.ui.shell.Shell
 import com.kotlang.ui.tabs.TabHeader
 import java.nio.file.Path
-
-private lateinit var refreshShellTabUICb: (Int) -> Unit
-private var shellRefreshCount = 0
-
-fun refreshShell() {
-    refreshShellTabUICb(++shellRefreshCount)
-}
 
 /**
  * There will be only one window :)
  */
 object OmnishellWindow {
-    private lateinit var changeTabUICb: (Int) -> Unit
-    private val shells: MutableList<Shell> = mutableListOf(Shell(index = 0), Shell(index = 1))
+    private val shells: MutableList<Shell> = mutableListOf(Shell(index = 0, remoteTargetManager = LocalTargetManager()))
+
+    private val selectedTab = mutableStateOf(0)
 
     fun changeTab(newTabIndex: Int) {
-        changeTabUICb(newTabIndex)
+        selectedTab.value = newTabIndex
     }
 
     fun closeTab(tabIndex: Int) {
+        shells[tabIndex].destroy()
         shells.removeAt(tabIndex)
         //re-assign tab indices
         for (i in shells.indices) {
             shells[i].index = i
         }
         val newTabIndex = 0
-        changeTabUICb(newTabIndex)
+        selectedTab.value = newTabIndex
     }
 
-    fun addTab() {
-        val newTab = Shell(index = shells.size)
+    fun addTab(target: RemoteTargetManager = LocalTargetManager()) {
+        val newTab = Shell(index = shells.size, remoteTargetManager = target)
         shells.add(newTab)
-        changeTabUICb(newTab.index)
+        selectedTab.value = newTab.index
     }
 
     fun destroy() {
@@ -49,19 +46,13 @@ object OmnishellWindow {
         }
     }
 
+    private val shellStateVersion = mutableStateOf(0)
+    fun refreshShell() {
+        shellStateVersion.value = shellStateVersion.value + 1
+    }
+
     @Composable
     fun Draw() {
-        val selectedTab = remember { mutableStateOf(0) }
-        val shellStateVersion = remember { mutableStateOf(0) }
-        refreshShellTabUICb = { refreshCnt: Int ->
-            //update ui only if state changed in active tab.
-            shellStateVersion.value = refreshCnt
-        }
-
-        changeTabUICb = { tabIndex: Int ->
-            selectedTab.value = tabIndex
-        }
-
         val tabHeader = TabHeader(this)
         Column {
             ScrollableTabRow(
