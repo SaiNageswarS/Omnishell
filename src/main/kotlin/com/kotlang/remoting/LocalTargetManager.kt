@@ -5,11 +5,12 @@ import com.kotlang.util.PortUtil
 
 class LocalTargetManager: RemoteTargetManager() {
     private val availablePort = PortUtil.getFreePort()
-    override fun runRemoteHostManager(): Process {
-        val os = System.getProperty("os.name").toLowerCase()
-        val hostAgentUrl = getHostAgentUrl(os)
+    private val localOs = System.getProperty("os.name").toLowerCase()
 
-        if (os.indexOf("mac") >= 0 || os.indexOf("linux") >= 0) {
+    override fun runRemoteHostManager(): Process {
+        val hostAgentUrl = getHostAgentUrl(localOs)
+
+        if (localOs.indexOf("mac") >= 0 || localOs.indexOf("linux") >= 0) {
             val p = Runtime.getRuntime().exec("chmod +x $hostAgentUrl")
             p.waitFor()
         }
@@ -21,4 +22,6 @@ class LocalTargetManager: RemoteTargetManager() {
         get() = availablePort
     override val host: String
         get() = "localhost"
+    override val os: String
+        get() = localOs
 }

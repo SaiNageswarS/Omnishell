@@ -53,4 +53,7 @@ class WslTargetManager(private val wslTarget: String): RemoteTargetManager() {
         get() = availablePort
     override val host: String
         get() = "localhost"
+    //wsl is always linux
+    override val os: String
+        get() = "linux"
 }

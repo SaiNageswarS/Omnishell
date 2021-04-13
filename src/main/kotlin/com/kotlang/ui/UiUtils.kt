@@ -57,11 +57,11 @@ fun Chip(text: String, dropDownItems: List<String> = listOf(), onSelect: (idx: I
 }
 
 @Composable
-fun PromptIcon() {
+fun PromptIcon(osShell: String) {
     Text(
-        "~",
+        "$osShell > ",
         color = MaterialTheme.colors.primary,
-        style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.W500)
+        style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Bold)
     )
 }
 
