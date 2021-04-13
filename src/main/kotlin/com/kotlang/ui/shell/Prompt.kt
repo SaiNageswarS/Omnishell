@@ -12,10 +12,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kotlang.omnishell.*
 import com.kotlang.shellCommands.ShellCommand
+import com.kotlang.ui.Chip
 import com.kotlang.ui.PromptIcon
 import com.kotlang.ui.SearchSuggestions
 import java.awt.event.KeyEvent
@@ -34,14 +37,16 @@ class Prompt(private val shell: Shell) {
 
     private fun runCommand(command: String) {
         val cmd = CommandContext.newBuilder().setCommand(command.replace("sudo", "sudo -S "))
-            .setWorkingDir(shell.getCurrentWorkingDir()).build()
+            .setWorkingDir(shell.getCurrentWorkingDir()).setShell(shell.osShell.value).build()
         val cmdRes = ShellCommand.getExecutionCard(cmd, shell)
 
         shell.addCommandExecution(cmdRes)
         runBlocking {
-            shell.hostAgent.historyManagerClient.addToHistory(
-                HistoryEntry.newBuilder().setCommand(command).build()
-            )
+            if (shell.osShell.value != "node") {
+                shell.hostAgent.historyManagerClient.addToHistory(
+                    HistoryEntry.newBuilder().setCommand(command).build()
+                )
+            }
         }
     }
 
@@ -81,6 +86,13 @@ class Prompt(private val shell: Shell) {
         }
     }
 
+    @Composable
+    fun PromptOsShellChoice() {
+        Chip("${shell.osShell.value} >", shell.availableOsShells) {
+            shell.osShell.value = shell.availableOsShells[it]
+        }
+    }
+
     @ExperimentalCoroutinesApi
     @Composable
     fun Draw() {
@@ -117,7 +129,7 @@ class Prompt(private val shell: Shell) {
                     }
                 },
                 placeholder = { Text("Run Command here. Press Tab for Auto-Complete") },
-                leadingIcon = { PromptIcon() },
+                leadingIcon = { PromptOsShellChoice() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .onPreviewKeyEvent {

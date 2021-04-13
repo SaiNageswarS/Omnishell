@@ -39,6 +39,8 @@ class CommandExecutionCard(
     ) {
     private val state= mutableStateOf(initialStatus)
     private lateinit var commandId: String
+    //immutable - initialized at the time of execution
+    private val osShell = shell.osShell.value
 
     //polling document for output
     private val ticker: Ticker = Ticker()
@@ -77,7 +79,7 @@ class CommandExecutionCard(
                         document.add(CommandOutput.newBuilder().setText("^W (Interrupted)")
                             .setFormat(CommandOutput.TextFormat.ERROR).build())
                         runBlocking { shell.hostAgent.commandExecutionClient.killProcess(
-                            CommandId.newBuilder().setId(commandId).build()
+                            CommandId.newBuilder().setId(commandId).setShell(osShell).build()
                         ) }
                     }
                 }
@@ -90,7 +92,7 @@ class CommandExecutionCard(
                             val input = processInput.value+"\n\r"
                             //don't close the writer
                             scope.launch {  shell.hostAgent.commandExecutionClient.giveInput(
-                                CommandInputById.newBuilder().setCmdId(commandId).setInput(input).build()
+                                CommandInputById.newBuilder().setShell(osShell).setCmdId(commandId).setInput(input).build()
                             ) }
 
                             val displayText = if (!isTextMasked.value) input
@@ -137,7 +139,7 @@ class CommandExecutionCard(
             commandId = shell.hostAgent.commandExecutionClient.initiateCommand(cmd).id
 
             shell.hostAgent.commandExecutionClient.runCommand(
-                CommandId.newBuilder().setId(commandId).build()
+                CommandId.newBuilder().setId(commandId).setShell(osShell).build()
             ).collect {
                 if (document.isEmpty() || document.last().format != it.format) {
                     document.add(it)
@@ -177,7 +179,7 @@ class CommandExecutionCard(
             ) {
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Row(modifier = Modifier.fillMaxWidth(0.93f)) {
-                        PromptIcon()
+                        PromptIcon(osShell)
                         Text(cmd.command, color = Color.DarkGray,
                             style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Bold)
                         )

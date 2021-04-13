@@ -14,13 +14,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.kotlang.HostAgent
 import com.kotlang.isOldVersion
+import com.kotlang.omnishell.ReplRequest
 import com.kotlang.remoting.RemoteTargetManager
 import com.kotlang.ui.window.OmnishellWindow
+import java.net.Socket
 import java.util.*
 
 class Shell(var commandExecutionCards: LinkedList<CommandExecutionCard> = LinkedList<CommandExecutionCard>(),
             var index: Int = 0,
             val remoteTargetManager: RemoteTargetManager) {
+
+    private val defaultShell = if (remoteTargetManager.os.indexOf("win") >= 0) "powershell"
+        else "/bin/sh"
+
+    var availableOsShells = mutableListOf(defaultShell)
+    var osShell = mutableStateOf( defaultShell )
 
     val hostAgent: HostAgent = HostAgent(remoteTargetManager)
     private val currentWorkingDirState = mutableStateOf(hostAgent.getHome())

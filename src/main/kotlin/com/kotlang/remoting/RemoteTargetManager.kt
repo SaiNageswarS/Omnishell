@@ -7,6 +7,7 @@ abstract class RemoteTargetManager {
 
     abstract val port: Int
     abstract val host: String
+    abstract val os: String
 
     fun getHostAgentUrl(os: String): String {
         return when {

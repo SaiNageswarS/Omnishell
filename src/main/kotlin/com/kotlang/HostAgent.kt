@@ -16,10 +16,9 @@ class HostAgent(remoteHost: RemoteTargetManager) {
     val commandExecutionClient: CommandExecutionServiceGrpcKt.CommandExecutionServiceCoroutineStub
     val environmentClient: EnvironmentManagerGrpcKt.EnvironmentManagerCoroutineStub
 
-    val process: Process
+    val process: Process = remoteHost.runRemoteHostManager()
 
     init {
-        process = remoteHost.runRemoteHostManager()
         channel = ManagedChannelBuilder.forAddress(remoteHost.host, remoteHost.port).usePlaintext().build()
         historyManagerClient = HistoryManagerGrpcKt.HistoryManagerCoroutineStub(channel)
         autoCompleteClient = AutoCompleteServiceGrpcKt.AutoCompleteServiceCoroutineStub(channel)
