@@ -1,5 +1,6 @@
 package com.kotlang.util
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.apache.logging.log4j.LogManager
 import java.net.URL
 import java.nio.file.Files
@@ -38,6 +39,10 @@ object HostAgentDownloadUtil {
             Files.copy(stream, Path.of(dest.toString(), "hostManager.zip"), StandardCopyOption.REPLACE_EXISTING)
             unzipFolder(Path.of(dest.toString(), "hostManager.zip"), Path.of(dest.toString(), "hostManager"))
             Files.delete(Paths.get(dest.toString(), "hostManager.zip"))
+            //write version
+            val versionJson = mapOf("version" to VersionVerificationUtil().currentVersion.versionString)
+            val objectMapper = ObjectMapper()
+            objectMapper.writeValue(Path.of(dest.toString(), "hostManager", "version.json").toFile(), versionJson)
         } catch (e: Exception) {
             logger.error("Failed getting host manager", e)
             exitProcess(1)
