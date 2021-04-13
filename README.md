@@ -3,8 +3,8 @@
 Modern shell combining the flexibility of graphical interface with the power of shell. Works with mac and linux.
 
 ## Intro
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=lt62btiXreg" target="_blank">
-    <img src="http://img.youtube.com/vi/lt62btiXreg/0.jpg" width="240" height="180" border="10" alt="Omnishell Intro" />
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=dWsTyO2ROds" target="_blank">
+    <img src="http://img.youtube.com/vi/dWsTyO2ROds/0.jpg" width="240" height="180" border="10" alt="Omnishell Intro" />
 </a>
 
 # Features
