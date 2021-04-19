@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -118,8 +119,8 @@ class CommandExecutionCard(
             ) {
                 for (child in document) {
                     when(child.format) {
-                        CommandOutput.TextFormat.ERROR -> Text(child.text.sanitize(), color = Color.Red)
-                        else -> Text(child.text.sanitize(), color = Color.DarkGray)
+                        CommandOutput.TextFormat.ERROR -> Text(child.text.sanitize(), color = Color.Red, fontFamily = FontFamily.Monospace)
+                        else -> Text(child.text.sanitize(), color = Color.DarkGray, fontFamily = FontFamily.Monospace)
                     }
                 }
 
@@ -181,7 +182,9 @@ class CommandExecutionCard(
                     Row(modifier = Modifier.fillMaxWidth(0.93f)) {
                         PromptIcon(osShell)
                         Text(cmd.command, color = Color.DarkGray,
-                            style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                             fontWeight = FontWeight.Bold,
+                             fontFamily = FontFamily.Monospace,
+                             fontSize = 15.sp
                         )
                     }
                     CommandStateIcon(state.value)

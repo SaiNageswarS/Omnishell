@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.kotlang.ui.window.OmnishellWindow
 
@@ -19,7 +20,7 @@ class TabHeader(private val windowActions: OmnishellWindow) {
             onClick = { windowActions.changeTab(index) }
         ) {
             Row {
-                Text(title, modifier = Modifier.padding(vertical = 10.dp))
+                Text(title, modifier = Modifier.padding(vertical = 10.dp), fontFamily = FontFamily.Monospace)
                 //close tab button
                 IconButton(onClick = { windowActions.closeTab(index) }) {
                     Icon(

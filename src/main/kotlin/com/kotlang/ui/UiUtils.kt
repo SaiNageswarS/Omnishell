@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,6 +38,7 @@ fun Chip(text: String, dropDownItems: List<String> = listOf(), onSelect: (idx: I
                 Row {
                     Text(text,
                         color = Color.Black,
+                        fontFamily = FontFamily.Monospace
                     )
 
                     Icon(Icons.Default.ArrowDropDown, contentDescription = "", tint = Color.Black)
@@ -49,7 +51,7 @@ fun Chip(text: String, dropDownItems: List<String> = listOf(), onSelect: (idx: I
                     onSelect(idx)
                     showDropDown.value = false
                 }) {
-                    Text(item, color = Color.Black)
+                    Text(item, color = Color.Black, fontFamily = FontFamily.Monospace)
                 }
             }
         }
@@ -61,7 +63,9 @@ fun PromptIcon(osShell: String) {
     Text(
         "$osShell > ",
         color = MaterialTheme.colors.primary,
-        style = TextStyle(fontSize = 15.sp, fontWeight = FontWeight.Bold)
+        fontWeight = FontWeight.Bold,
+        fontFamily = FontFamily.Monospace,
+        fontSize = 15.sp
     )
 }
 
@@ -84,7 +88,7 @@ fun SearchSuggestions(items: List<String>,
                     DropdownMenuItem(onClick = { onClick(item) },
                         modifier = Modifier.background(bckgndColor)
                     ) {
-                        Text(item, color = textColor)
+                        Text(item, color = textColor, fontFamily = FontFamily.Monospace)
                     }
                 }
             }

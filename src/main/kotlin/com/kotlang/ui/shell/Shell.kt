@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.kotlang.HostAgent
 import com.kotlang.isOldVersion
@@ -68,6 +69,7 @@ class Shell(var commandExecutionCards: LinkedList<CommandExecutionCard> = Linked
                     Text(
                         "Update available. Visit https://github.com/SaiNageswarS/Omnishell/releases",
                         color = warningColor,
+                        fontFamily = FontFamily.Monospace
                     )
                 }
             }

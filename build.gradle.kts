@@ -5,7 +5,7 @@ import com.google.protobuf.gradle.*
 
 plugins {
     kotlin("jvm") version "1.4.32"
-    id("org.jetbrains.compose") version "0.4.0-build180"
+    id("org.jetbrains.compose") version "0.4.0-build183"
     id("com.google.protobuf") version "0.8.15"
 }
 

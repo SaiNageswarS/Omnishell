@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -105,7 +106,7 @@ class Prompt(private val shell: Shell) {
         ) {
             TextField(
                 value = command.value,
-                textStyle = TextStyle(color = Color.DarkGray),
+                textStyle = TextStyle(color = Color.DarkGray, fontFamily = FontFamily.Monospace),
                 onValueChange = { newVal: TextFieldValue ->
                     command.value = newVal
                     scope.launch {
@@ -128,7 +129,7 @@ class Prompt(private val shell: Shell) {
                         commandSuggestions.value = suggestions.distinct()
                     }
                 },
-                placeholder = { Text("Run Command here. Press Tab for Auto-Complete") },
+                placeholder = { Text("Run Command here. Press Tab for Auto-Complete", fontFamily = FontFamily.Monospace) },
                 leadingIcon = { PromptOsShellChoice() },
                 modifier = Modifier
                     .fillMaxWidth()

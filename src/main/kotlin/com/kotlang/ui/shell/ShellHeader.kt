@@ -9,6 +9,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kotlang.remoting.LocalTargetManager
@@ -36,6 +37,7 @@ class ShellHeader(private val shell: Shell) {
                 Text(
                     getHost(),
                     color = Color.DarkGray,
+                    fontFamily = FontFamily.Monospace,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(10.dp)
                 )
@@ -49,6 +51,7 @@ class ShellHeader(private val shell: Shell) {
                 Text(
                     currentWorkingDir,
                     color = Color.DarkGray,
+                    fontFamily = FontFamily.Monospace,
                     modifier = Modifier.padding(10.dp)
                 )
             }
@@ -62,6 +65,7 @@ class ShellHeader(private val shell: Shell) {
                     "Env",
                     color = Color.DarkGray,
                     fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.Monospace,
                     modifier = Modifier.padding(10.dp)
                 )
             }

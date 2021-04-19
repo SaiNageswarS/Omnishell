@@ -10,6 +10,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kotlang.omnishell.EnvironmentRequest
@@ -26,12 +27,11 @@ fun EnvironmentDialog(shell: Shell) = Window(title = "Environment") {
                 Text(
                     entry.split("=")[0],
                     modifier = Modifier.padding(horizontal = 5.dp),
-                    style = TextStyle(
-                        color = MaterialTheme.colors.primaryVariant,
-                        fontWeight = FontWeight.SemiBold,
-                    )
+                    color = MaterialTheme.colors.primaryVariant,
+                    fontWeight = FontWeight.SemiBold,
+                    fontFamily = FontFamily.Monospace
                 )
-                Text(entry.split("=")[1])
+                Text(entry.split("=")[1], fontFamily = FontFamily.Monospace)
             }
             Divider()
         }
