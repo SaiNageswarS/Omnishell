@@ -28,7 +28,7 @@ class ExecutionOutputDisplay {
                     }
 
                     if (tick > 0) {
-                        Text(tick.toString(), color = Color.Transparent)
+                        Text(tick.toString(), color = Color.DarkGray)
                     }
                 }
             }

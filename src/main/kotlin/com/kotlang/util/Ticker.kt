@@ -3,9 +3,7 @@ package com.kotlang.util
 /**
  * Used to produce ticks for UI events.
  */
-class Ticker() {
-    lateinit var notify: (Int) -> Unit
-
+class Ticker(private val notify: (Int) -> Unit) {
     private var currentTick = 0
         set(value) {
             field = value
