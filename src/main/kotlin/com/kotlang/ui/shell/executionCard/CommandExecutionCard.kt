@@ -1,4 +1,4 @@
-package com.kotlang.ui.shell
+package com.kotlang.ui.shell.executionCard
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -9,7 +9,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -21,12 +20,12 @@ import com.kotlang.omnishell.CommandId
 import com.kotlang.omnishell.CommandInputById
 import com.kotlang.omnishell.CommandOutput
 import com.kotlang.ui.PromptIcon
+import com.kotlang.ui.shell.CommandActions
+import com.kotlang.ui.shell.CommandActionsPrompt
+import com.kotlang.ui.shell.CommandStateIcon
+import com.kotlang.ui.shell.Shell
 import com.kotlang.util.Ticker
-import com.kotlang.util.sanitize
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.awt.event.KeyEvent
@@ -111,30 +110,6 @@ class CommandExecutionCard(
         )
     }
 
-    @Composable
-    private fun OutputDisplay(tick: Int) {
-        synchronized(this) {
-            Column(
-                modifier = Modifier.padding(horizontal = 0.dp, vertical = 10.dp)
-            ) {
-                for (child in document) {
-                    when(child.format) {
-                        CommandOutput.TextFormat.ERROR -> Text(child.text.sanitize(), color = Color.Red, fontFamily = FontFamily.Monospace)
-                        else -> Text(child.text.sanitize(), color = Color.DarkGray, fontFamily = FontFamily.Monospace)
-                    }
-                }
-
-                if (state.value == CommandOutput.Status.RUNNING) {
-                    RunningProcessInput()
-                }
-                if (tick > 0) {
-                    Text(tick.toString(), modifier = Modifier.padding(0.dp, 10.dp),
-                        color = Color.Gray)
-                }
-            }
-        }
-    }
-
     private suspend fun pollExecutionClient() {
         if (state.value == CommandOutput.Status.INIT) {
             commandId = shell.hostAgent.commandExecutionClient.initiateCommand(cmd).id
@@ -154,6 +129,8 @@ class CommandExecutionCard(
             }
         }
     }
+
+    private val executionOutputDisplay: ExecutionOutputDisplay = ExecutionOutputDisplay()
 
     @Composable
     fun Draw(shellStateVersion: Int) {
@@ -191,7 +168,11 @@ class CommandExecutionCard(
                     Text(shellStateVersion.toString(), color = Color.Transparent)
                 }
 
-                OutputDisplay(currentTick.value)
+                executionOutputDisplay.Draw(currentTick.value, document)
+                if (state.value == CommandOutput.Status.RUNNING) {
+                    RunningProcessInput()
+                }
+
                 if (actions != null) {
                     CommandActionsPrompt(actions!!) {
                         actions = null

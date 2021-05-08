@@ -3,12 +3,11 @@ package com.kotlang.shellCommands
 import com.kotlang.omnishell.CommandContext
 import com.kotlang.omnishell.CommandOutput
 import com.kotlang.omnishell.ReplRequest
-import com.kotlang.ui.shell.CommandExecutionCard
+import com.kotlang.ui.shell.executionCard.CommandExecutionCard
 import com.kotlang.ui.shell.Shell
 import com.kotlang.util.PortUtil
 import kotlinx.coroutines.runBlocking
 import org.apache.logging.log4j.LogManager
-import java.net.Socket
 
 class ReplCommand: ShellCommand() {
     companion object {

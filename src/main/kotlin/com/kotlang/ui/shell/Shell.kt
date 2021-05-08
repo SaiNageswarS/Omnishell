@@ -15,10 +15,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.kotlang.HostAgent
 import com.kotlang.isOldVersion
-import com.kotlang.omnishell.ReplRequest
 import com.kotlang.remoting.RemoteTargetManager
+import com.kotlang.ui.shell.executionCard.CommandExecutionCard
 import com.kotlang.ui.window.OmnishellWindow
-import java.net.Socket
 import java.util.*
 
 class Shell(var commandExecutionCards: LinkedList<CommandExecutionCard> = LinkedList<CommandExecutionCard>(),

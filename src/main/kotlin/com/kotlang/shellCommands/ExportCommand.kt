@@ -5,7 +5,7 @@ import com.kotlang.omnishell.CommandOutput
 import com.kotlang.omnishell.EnvVariableRequest
 import com.kotlang.ui.shell.ActionDetail
 import com.kotlang.ui.shell.CommandActions
-import com.kotlang.ui.shell.CommandExecutionCard
+import com.kotlang.ui.shell.executionCard.CommandExecutionCard
 import com.kotlang.ui.shell.Shell
 import kotlinx.coroutines.runBlocking
 

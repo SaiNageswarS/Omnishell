@@ -2,7 +2,7 @@ package com.kotlang.shellCommands
 
 import com.kotlang.omnishell.CommandContext
 import com.kotlang.omnishell.CommandOutput
-import com.kotlang.ui.shell.CommandExecutionCard
+import com.kotlang.ui.shell.executionCard.CommandExecutionCard
 import com.kotlang.ui.shell.Shell
 
 class EditorCommand: ShellCommand() {
